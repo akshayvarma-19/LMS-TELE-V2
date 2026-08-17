@@ -15,9 +15,9 @@ import { PublicSearchPage } from './pages/citizen/PublicSearchPage';
 import { CitizenOcrPage } from './pages/citizen/OcrPage';
 import { CitizenGrievancesPage } from './pages/citizen/GrievancesPage';
 import { CitizenGrievanceDetailPage } from './pages/citizen/GrievanceDetailPage';
-import { CitizenAnomaliesPage } from './pages/citizen/AnomaliesPage';
 import { CitizenLandMapPage } from './pages/citizen/LandMapPage';
 import { CitizenAssistantPage } from './pages/citizen/AssistantPage';
+import { CitizenNotificationsPage } from './pages/citizen/NotificationsPage';
 import { ProfilePage } from './pages/citizen/ProfilePage';
 
 // Officer Pages
@@ -28,7 +28,6 @@ import { OfficerAddLandRecordPage } from './pages/officer/OfficerAddLandRecordPa
 import { OfficerEditLandRecordPage } from './pages/officer/OfficerEditLandRecordPage';
 import { OfficerGrievancesPage } from './pages/officer/OfficerGrievancesPage';
 import { OfficerGrievanceDetailPage } from './pages/officer/OfficerGrievanceDetailPage';
-import { OfficerAnomaliesPage } from './pages/officer/OfficerAnomaliesPage';
 import { OfficerDocumentsPage } from './pages/officer/OfficerDocumentsPage';
 
 export function App() {
@@ -48,9 +47,9 @@ export function App() {
           <Route path="ocr" element={<CitizenOcrPage />} />
           <Route path="grievances" element={<CitizenGrievancesPage />} />
           <Route path="grievances/:id" element={<CitizenGrievanceDetailPage />} />
-          <Route path="anomalies" element={<CitizenAnomaliesPage />} />
           <Route path="map" element={<CitizenLandMapPage />} />
           <Route path="assistant" element={<CitizenAssistantPage />} />
+          <Route path="notifications" element={<CitizenNotificationsPage />} />
           <Route path="profile" element={<ProfilePage />} />
         </Route>
 
@@ -64,7 +63,6 @@ export function App() {
           <Route path="land-records/:id/edit" element={<OfficerEditLandRecordPage />} />
           <Route path="grievances" element={<OfficerGrievancesPage />} />
           <Route path="grievances/:id" element={<OfficerGrievanceDetailPage />} />
-          <Route path="anomalies" element={<OfficerAnomaliesPage />} />
           <Route path="documents" element={<OfficerDocumentsPage />} />
           <Route path="profile" element={<ProfilePage />} />
         </Route>

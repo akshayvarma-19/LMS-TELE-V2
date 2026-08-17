@@ -4,11 +4,11 @@ import {
   LayoutDashboard,
   FileText,
   Search,
-  FileCheck,
   AlertOctagon,
-  ShieldAlert,
+  Upload,
   Map,
   Bot,
+  Bell,
   User,
   Menu,
   X,
@@ -24,58 +24,66 @@ export const CitizenLayout: React.FC = () => {
     { label: 'Dashboard', path: '/citizen/dashboard', icon: LayoutDashboard },
     { label: 'My Land Records', path: '/citizen/land-records', icon: FileText },
     { label: 'Search Land Records', path: '/citizen/search', icon: Search },
-    { label: 'OCR Verification', path: '/citizen/ocr', icon: FileCheck },
     { label: 'My Grievances', path: '/citizen/grievances', icon: AlertOctagon },
-    { label: 'Anomaly Alerts', path: '/citizen/anomalies', icon: ShieldAlert },
+    { label: 'Upload Document', path: '/citizen/ocr', icon: Upload },
     { label: '3D Land Map', path: '/citizen/map', icon: Map },
     { label: 'AI Assistant', path: '/citizen/assistant', icon: Bot },
+    { label: 'Notifications', path: '/citizen/notifications', icon: Bell, hasBadge: false },
     { label: 'Profile & Settings', path: '/citizen/profile', icon: User },
   ];
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50">
-      <Header userRole="citizen" />
+      <Header userRole="citizen" unreadNotificationsCount={0} />
 
       <div className="flex-1 flex overflow-hidden">
-        {/* Desktop Sidebar */}
-        <aside className="hidden md:flex flex-col w-64 bg-slate-900 border-r border-slate-800 text-slate-300">
+        {/* Desktop Sidebar (Dark Blue #0F172A) */}
+        <aside className="hidden md:flex flex-col w-64 bg-slate-900 border-r border-slate-800 text-slate-300 shrink-0">
           <div className="p-4 border-b border-slate-800">
-            <h2 className="text-xs uppercase font-semibold text-slate-400 tracking-wider">Citizen Navigation</h2>
+            <h2 className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Citizen Navigation</h2>
           </div>
           <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
             {navItems.map((item) => {
               const Icon = item.icon;
-              const isActive = location.pathname === item.path || (item.path !== '/citizen/dashboard' && location.pathname.startsWith(item.path));
+              const isActive =
+                location.pathname === item.path ||
+                (item.path !== '/citizen/dashboard' && location.pathname.startsWith(item.path));
               return (
                 <NavLink
                   key={item.path}
                   to={item.path}
-                  className={`flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                  className={`flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                     isActive
                       ? 'bg-blue-700 text-white shadow-sm font-semibold'
                       : 'text-slate-300 hover:bg-slate-800 hover:text-white'
                   }`}
                 >
-                  <Icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-white' : 'text-slate-400'}`} />
-                  <span>{item.label}</span>
+                  <div className="flex items-center space-x-3">
+                    <Icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-white' : 'text-slate-400'}`} />
+                    <span>{item.label}</span>
+                  </div>
+                  {item.hasBadge && (
+                    <span className="w-2 h-2 rounded-full bg-blue-500" />
+                  )}
                 </NavLink>
               );
             })}
           </nav>
+
           <div className="p-4 border-t border-slate-800">
             <NavLink
               to="/login"
-              className="flex items-center space-x-3 px-3 py-2 text-sm font-medium text-rose-400 hover:bg-slate-800 rounded-lg transition-colors"
+              className="flex items-center space-x-3 px-3 py-2 text-sm font-medium text-slate-400 hover:text-rose-400 hover:bg-slate-800 rounded-lg transition-colors"
             >
               <LogOut className="w-5 h-5" />
-              <span>Sign Out</span>
+              <span>Logout</span>
             </NavLink>
           </div>
         </aside>
 
-        {/* Mobile Header / Drawer Button */}
+        {/* Mobile Header Bar */}
         <div className="md:hidden bg-slate-900 text-white px-4 py-2 flex items-center justify-between border-b border-slate-800">
-          <span className="text-xs font-semibold text-blue-400 uppercase tracking-wider">Citizen Portal</span>
+          <span className="text-xs font-bold text-blue-400 uppercase tracking-wider">Citizen Navigation</span>
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
             className="p-1.5 rounded-lg hover:bg-slate-800 text-slate-300"
@@ -85,7 +93,7 @@ export const CitizenLayout: React.FC = () => {
           </button>
         </div>
 
-        {/* Mobile Drawer Backdrop */}
+        {/* Mobile Backdrop */}
         {mobileOpen && (
           <div
             className="fixed inset-0 z-40 bg-slate-900/60 backdrop-blur-xs md:hidden"
@@ -114,21 +122,23 @@ export const CitizenLayout: React.FC = () => {
                   key={item.path}
                   to={item.path}
                   onClick={() => setMobileOpen(false)}
-                  className={`flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                  className={`flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                     isActive
                       ? 'bg-blue-700 text-white shadow-sm font-semibold'
                       : 'text-slate-300 hover:bg-slate-800 hover:text-white'
                   }`}
                 >
-                  <Icon className="w-5 h-5" />
-                  <span>{item.label}</span>
+                  <div className="flex items-center space-x-3">
+                    <Icon className="w-5 h-5" />
+                    <span>{item.label}</span>
+                  </div>
                 </NavLink>
               );
             })}
           </nav>
         </div>
 
-        {/* Main Content Area */}
+        {/* Main Content View */}
         <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full">
           <Outlet />
         </main>
