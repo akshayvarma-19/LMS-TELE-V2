@@ -1,5 +1,5 @@
 import React from 'react';
-import { ServerOff } from 'lucide-react';
+import { Info } from 'lucide-react';
 
 interface ErrorAlertProps {
   title?: string;
@@ -7,18 +7,17 @@ interface ErrorAlertProps {
 }
 
 export const ErrorAlert: React.FC<ErrorAlertProps> = ({
-  title = 'Backend Connection Required',
-  message = 'This feature requires active communication with the backend service. Data will populate automatically when integrated.',
+  title = 'Data services are currently unavailable.',
+  message = 'Your records will appear here when the service is connected.',
 }) => {
   return (
-    <div className="rounded-xl bg-amber-50 border border-amber-200 p-4 mb-6 text-amber-900">
-      <div className="flex items-start space-x-3">
-        <ServerOff className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
-        <div>
-          <h4 className="text-sm font-bold flex items-center space-x-2">
-            <span>{title}</span>
-          </h4>
-          <p className="text-xs text-amber-800 mt-1 leading-relaxed">{message}</p>
+    <div className="rounded-lg bg-slate-100 border border-[#D9E0E8] px-4 py-3 text-[#0F172A]">
+      <div className="flex items-center space-x-2.5">
+        <Info className="w-4 h-4 text-slate-500 shrink-0" />
+        <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2 text-xs">
+          <span className="font-semibold text-slate-800">{title}</span>
+          <span className="text-slate-500 hidden sm:inline">•</span>
+          <span className="text-slate-600">{message}</span>
         </div>
       </div>
     </div>

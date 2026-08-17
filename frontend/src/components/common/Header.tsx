@@ -1,18 +1,13 @@
 import React from 'react';
-import { Building2, Bell, UserCircle, LogOut, RefreshCw } from 'lucide-react';
+import { Building2, Bell, User, LogOut, RefreshCw } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 
 interface HeaderProps {
   userRole?: 'citizen' | 'officer';
-  unreadNotificationsCount?: number;
   onLogout?: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({
-  userRole = 'citizen',
-  unreadNotificationsCount = 0,
-  onLogout,
-}) => {
+export const Header: React.FC<HeaderProps> = ({ userRole = 'citizen', onLogout }) => {
   const navigate = useNavigate();
 
   const handlePortalSwitch = () => {
@@ -24,65 +19,60 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <header className="bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-30 shadow-md">
+    <header className="bg-[#0B1F3A] text-white border-b border-[#1E293B] sticky top-0 z-30">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Left: Logo & Title */}
+        <div className="flex items-center justify-between h-14">
+          {/* Left: Official Government Header Branding */}
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-lg bg-blue-700 flex items-center justify-center text-white shadow-sm shrink-0">
-              <Building2 className="w-6 h-6" />
+            <div className="w-8 h-8 rounded bg-[#1D4ED8] flex items-center justify-center text-white shrink-0">
+              <Building2 className="w-5 h-5" />
             </div>
-            <div>
-              <div className="flex items-center space-x-2">
-                <span className="text-[10px] uppercase font-bold tracking-wider text-blue-400">Government Portal</span>
-                <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-slate-800 text-slate-300 border border-slate-700">
-                  PS-09
-                </span>
-              </div>
-              <h1 className="text-xs font-bold text-white tracking-tight sm:text-sm">
-                Digital Land Record & Grievance Portal
-              </h1>
+            <div className="flex items-center space-x-2">
+              <span className="text-[11px] font-bold tracking-wider text-slate-300 uppercase">Government Portal</span>
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">
+                PS-09
+              </span>
+              <span className="hidden md:inline text-slate-500">•</span>
+              <span className="hidden md:inline text-xs font-semibold text-slate-200">
+                Digital Land Record & Grievance Redressal Portal
+              </span>
             </div>
           </div>
 
-          {/* Right: Notification Bell, Portal Selector, User Avatar, Logout */}
-          <div className="flex items-center space-x-3">
+          {/* Right: Actions */}
+          <div className="flex items-center space-x-2 sm:space-x-3">
             {/* Notification Bell */}
             <Link
-              to={userRole === 'officer' ? '/officer/documents' : '/citizen/notifications'}
-              className="relative p-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition-colors"
+              to="/citizen/notifications"
+              className="p-1.5 rounded text-slate-300 hover:text-white hover:bg-[#1E293B] transition-colors"
               title="Notifications"
             >
-              <Bell className="w-5 h-5" />
-              {unreadNotificationsCount > 0 && (
-                <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 rounded-full bg-blue-500 ring-2 ring-slate-900" />
-              )}
+              <Bell className="w-4 h-4" />
             </Link>
 
-            {/* Portal Switcher Button */}
+            {/* Role / Portal Switcher */}
             <button
               onClick={handlePortalSwitch}
-              className="hidden sm:flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition-colors"
-              title="Switch Portal View"
+              className="hidden sm:flex items-center space-x-1.5 px-2.5 py-1 rounded bg-[#1E293B] hover:bg-slate-700 text-slate-200 text-xs font-medium border border-slate-700 transition-colors"
             >
-              <RefreshCw className="w-3.5 h-3.5 text-blue-400" />
+              <RefreshCw className="w-3 h-3 text-blue-400" />
               <span className="capitalize">{userRole === 'citizen' ? 'Officer Portal' : 'Citizen Portal'}</span>
             </button>
 
-            {/* User Profile */}
+            {/* Profile */}
             <Link
               to={userRole === 'officer' ? '/officer/profile' : '/citizen/profile'}
-              className="p-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition-colors"
+              className="p-1.5 rounded text-slate-300 hover:text-white hover:bg-[#1E293B] transition-colors"
               title="Profile & Settings"
             >
-              <UserCircle className="w-6 h-6" />
+              <User className="w-4.5 h-4.5" />
             </Link>
 
             {/* Logout */}
             <Link
               to="/login"
               onClick={onLogout}
-              className="flex items-center space-x-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-colors"
+              className="flex items-center space-x-1 px-2.5 py-1 text-xs font-medium rounded bg-[#1E293B] hover:bg-slate-700 text-slate-200 border border-slate-700 transition-colors"
             >
               <LogOut className="w-3.5 h-3.5 text-slate-400" />
               <span className="hidden sm:inline">Logout</span>
