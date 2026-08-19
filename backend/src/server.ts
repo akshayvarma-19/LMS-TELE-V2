@@ -2,6 +2,16 @@ import express, { Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { supabase } from './lib/supabase.js';
+import authRouter from './routes/auth.js';
+import recordsRouter from './routes/records.js';
+import citizenLandRouter from './routes/citizenLandRoutes.js';
+import publicLandRouter from './routes/publicLandRoutes.js';
+import officerLandRouter from './routes/officerLandRoutes.js';
+import citizenGrievanceRouter from './routes/citizenGrievanceRoutes.js';
+import officerGrievanceRouter from './routes/officerGrievanceRoutes.js';
+import ocrExtractionRouter from './routes/ocrExtractionRoutes.js';
+import assistantRouter from './routes/assistantRoutes.js';
+import mapRouter from './routes/mapRoutes.js';
 
 dotenv.config();
 
@@ -10,6 +20,29 @@ const PORT = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(express.json());
+
+// Sanitize requested URL to trim trailing %0A, newlines or spaces
+app.use((req, _res, next) => {
+  req.url = req.url.replace(/(%0[aA]|%0[dD]|\s|\r|\n)+$/g, '');
+  next();
+});
+
+app.use('/api/auth', authRouter);
+app.use('/api/records', recordsRouter);
+app.use('/api/citizen/lands', citizenLandRouter);
+app.use('/api/lands', publicLandRouter);
+app.use('/api/officer/lands', officerLandRouter);
+app.use('/api/citizen/grievances', citizenGrievanceRouter);
+app.use('/api/officer/grievances', officerGrievanceRouter);
+app.use('/api/citizen/ocr', ocrExtractionRouter);
+app.use('/api/assistant', assistantRouter);
+app.use('/api/map', mapRouter);
+
+
+
+
+
+
 
 app.get('/api/health', (_req: Request, res: Response) => {
   res.json({ status: 'ok' });
