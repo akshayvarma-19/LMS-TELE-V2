@@ -15,17 +15,8 @@ export const publicLandController = {
       const filterTaluk = typeof taluk === 'string' ? taluk.trim() : undefined;
       const filterDistrict = typeof district === 'string' ? district.trim() : undefined;
 
-      // Validate that at least one search criterion is provided
-      if (!filterSurveyNumber && !filterVillage && !filterTaluk && !filterDistrict) {
-        res.status(400).json({
-          success: false,
-          error: {
-            message: 'Please provide at least one search criterion.',
-            code: 'SEARCH_CRITERIA_REQUIRED'
-          }
-        });
-        return;
-      }
+      // No criteria check needed to allow searching all lands
+
 
       // Default pagination values
       let parsedPage = 1;

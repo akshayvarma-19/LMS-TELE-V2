@@ -71,7 +71,7 @@ export const notificationController = {
         return;
       }
 
-      await notificationService.markAsRead(notificationId, userId);
+      await notificationService.markAsRead(notificationId as string, userId);
 
       res.status(200).json({
         success: true,
