@@ -1,5 +1,5 @@
 import React from 'react';
-import { Building2, Bell, User, LogOut, RefreshCw } from 'lucide-react';
+import { Building2, Bell, User, LogOut, ShieldCheck, RefreshCw } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 
 interface HeaderProps {
@@ -19,60 +19,66 @@ export const Header: React.FC<HeaderProps> = ({ userRole = 'citizen', onLogout }
   };
 
   return (
-    <header className="bg-white text-[#111827] border-b border-[#D9E3E3] sticky top-0 z-30">
-      <div className="w-full px-4 sm:px-6 lg:px-6">
+    <header className="bg-white text-[#101828] border-b border-[#D9E2E1] sticky top-0 z-30 shadow-[0_1px_3px_rgba(16,24,40,0.05)]">
+      <div className="w-full px-4 sm:px-6">
         <div className="flex items-center justify-between h-14">
-          {/* Left: TRACIA PS-09 Branding */}
+          {/* Left Branding */}
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 rounded bg-[#034E4E] flex items-center justify-center text-white shrink-0">
-              <Building2 className="w-5 h-5" />
+            <div className="w-8 h-8 rounded-lg bg-[#034E4E] flex items-center justify-center text-white shrink-0 shadow-xs">
+              <Building2 className="w-4.5 h-4.5" />
             </div>
-            <div className="flex items-center space-x-2">
-              <span className="text-base font-extrabold tracking-tight text-[#034E4E]">TRACIA</span>
-              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-[#F8FAFA] text-[#034E4E] border border-[#D9E3E3]">
+            <div className="flex items-center space-x-2.5">
+              <span className="text-lg font-extrabold tracking-tight text-[#034E4E]">TRACIA</span>
+              <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-[#F4F8F7] text-[#034E4E] border border-[#D9E2E1] tracking-wide">
                 PS-09
               </span>
-              <span className="hidden md:inline text-[#526262]">•</span>
-              <span className="hidden md:inline text-xs font-medium text-[#526262]">
+              <span className="hidden md:inline text-[#667085]">•</span>
+              <span className="hidden md:inline text-xs font-semibold text-[#667085] tracking-wide">
                 Digital Land Record & Grievance Redressal
               </span>
             </div>
           </div>
 
-          {/* Right: Actions */}
+          {/* Right Controls */}
           <div className="flex items-center space-x-2 sm:space-x-3">
             {/* Notification Bell */}
             <Link
               to="/citizen/notifications"
-              className="p-1.5 rounded text-[#526262] hover:text-[#034E4E] hover:bg-[#F8FAFA] transition-colors"
+              className="relative p-2 rounded-lg text-[#667085] hover:text-[#034E4E] hover:bg-[#F4F8F7] transition-colors"
               title="Notifications"
             >
-              <Bell className="w-4 h-4" />
+              <Bell className="w-4.5 h-4.5" />
+              <span className="absolute top-1.5 right-1.5 w-3.5 h-3.5 bg-[#034E4E] text-white text-[9px] font-extrabold rounded-full flex items-center justify-center border border-white">
+                3
+              </span>
             </Link>
 
-            {/* Role / Portal Switcher */}
+            {/* Portal Switcher Button */}
             <button
               onClick={handlePortalSwitch}
-              className="hidden sm:flex items-center space-x-1.5 px-2.5 py-1 rounded bg-[#F8FAFA] hover:bg-[#034E4E] hover:text-white text-[#034E4E] text-xs font-medium border border-[#D9E3E3] transition-colors group"
+              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-[#F4F8F7] hover:bg-[#034E4E] hover:text-white text-[#034E4E] text-xs font-bold border border-[#D9E2E1] transition-all group shadow-xs"
             >
-              <RefreshCw className="w-3 h-3 text-[#034E4E] group-hover:text-white transition-colors" />
-              <span className="capitalize">{userRole === 'citizen' ? 'Officer Portal' : 'Citizen Portal'}</span>
+              <ShieldCheck className="w-3.5 h-3.5 text-[#034E4E] group-hover:text-white transition-colors" />
+              <span className="hidden sm:inline">
+                {userRole === 'citizen' ? 'Officer Portal' : 'Citizen Portal'}
+              </span>
+              <RefreshCw className="w-3 h-3 text-[#667085] group-hover:text-white sm:hidden transition-colors" />
             </button>
 
-            {/* Profile */}
+            {/* User Profile */}
             <Link
               to={userRole === 'officer' ? '/officer/profile' : '/citizen/profile'}
-              className="p-1.5 rounded text-[#526262] hover:text-[#034E4E] hover:bg-[#F8FAFA] transition-colors"
+              className="p-2 rounded-lg text-[#667085] hover:text-[#034E4E] hover:bg-[#F4F8F7] transition-colors"
               title="Profile & Settings"
             >
               <User className="w-4.5 h-4.5" />
             </Link>
 
-            {/* Logout */}
+            {/* Logout Button */}
             <Link
               to="/login"
               onClick={onLogout}
-              className="flex items-center space-x-1 px-2.5 py-1 text-xs font-medium rounded bg-white hover:bg-[#F8FAFA] text-[#526262] hover:text-[#034E4E] border border-[#D9E3E3] transition-colors"
+              className="flex items-center space-x-1.5 px-2.5 py-1.5 text-xs font-semibold rounded-lg bg-white hover:bg-[#F4F8F7] text-[#667085] hover:text-[#034E4E] border border-[#D9E2E1] transition-colors"
             >
               <LogOut className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Logout</span>

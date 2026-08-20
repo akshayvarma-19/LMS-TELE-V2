@@ -1,6 +1,6 @@
 import React from 'react';
 
-export type BadgeVariant = 'success' | 'warning' | 'danger' | 'info' | 'neutral';
+export type BadgeVariant = 'success' | 'warning' | 'danger' | 'info' | 'neutral' | 'primary';
 
 interface BadgeProps {
   variant?: BadgeVariant;
@@ -10,17 +10,18 @@ interface BadgeProps {
 
 export const Badge: React.FC<BadgeProps> = ({ variant = 'neutral', children, size = 'md' }) => {
   const styles: Record<BadgeVariant, string> = {
-    success: 'bg-white text-[rgb(3,78,78)] border-[#71B2B2]',
-    warning: 'bg-white text-[rgb(17,110,110)] border-[#71B2B2]',
-    danger: 'bg-white text-[rgb(3,78,78)] border-[rgb(17,110,110)] font-bold',
-    info: 'bg-white text-[rgb(30,139,139)] border-[#E5E5E5]',
-    neutral: 'bg-white text-[#1F1F1F] border-[#E5E5E5]',
+    primary: 'bg-[#EAF4F3] text-[#034E4E] border-[#0B6868]/30 font-semibold',
+    success: 'bg-[#ECFDF5] text-[#047857] border-[#10B981]/30 font-semibold',
+    warning: 'bg-[#FFFBEB] text-[#B45309] border-[#F59E0B]/30 font-semibold',
+    danger: 'bg-[#FEF2F2] text-[#B91C1C] border-[#EF4444]/30 font-semibold',
+    info: 'bg-[#F0F9FF] text-[#0369A1] border-[#0284C7]/30 font-semibold',
+    neutral: 'bg-[#F4F8F7] text-[#101828] border-[#D9E2E1] font-semibold',
   };
 
-  const sizeStyles = size === 'sm' ? 'px-2 py-0.5 text-xs' : 'px-2.5 py-1 text-xs font-semibold';
+  const sizeStyles = size === 'sm' ? 'px-2 py-0.5 text-[11px]' : 'px-2.5 py-1 text-xs';
 
   return (
-    <span className={`inline-flex items-center rounded-full border ${styles[variant]} ${sizeStyles}`}>
+    <span className={`inline-flex items-center rounded-md border ${styles[variant]} ${sizeStyles} tracking-wide`}>
       {children}
     </span>
   );
