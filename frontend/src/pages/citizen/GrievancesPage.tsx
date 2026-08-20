@@ -1,27 +1,106 @@
-import React, { useState } from 'react';
-import { AlertOctagon, Filter, Plus } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { AlertOctagon, Filter, Plus, Loader2, ChevronRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { EmptyState } from '../../components/common/EmptyState';
 import { ErrorAlert } from '../../components/common/ErrorAlert';
+import { grievanceService } from '../../services/grievanceService';
+import { landService } from '../../services/landService';
+import type { Grievance, LandRecord } from '../../types';
 
 export const CitizenGrievancesPage: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
   const [showNewModal, setShowNewModal] = useState(false);
-  const [description, setDescription] = useState('');
-  const [category, setCategory] = useState('ocr_mismatch');
+  
+  const [lands, setLands] = useState<LandRecord[]>([]);
+  const [grievances, setGrievances] = useState<Grievance[]>([]);
+  const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  
+  // Form fields
+  const [selectedLandId, setSelectedLandId] = useState('');
+  const [category, setCategory] = useState<Grievance['category']>('ocr_mismatch');
+  const [description, setDescription] = useState('');
   const [notice, setNotice] = useState<string | null>(null);
 
-  const handleSubmitGrievance = (e: React.FormEvent) => {
+  // Check URL query parameters (for redirect from OCR Matrix)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const landId = params.get('land_id');
+    const cat = params.get('category') as Grievance['category'];
+    const desc = params.get('description');
+    
+    if (landId) setSelectedLandId(landId);
+    if (cat) setCategory(cat);
+    if (desc) setDescription(desc);
+    if (landId || cat || desc) {
+      setShowNewModal(true);
+    }
+  }, []);
+
+  const fetchDashboardData = async () => {
+    setLoading(true);
+    setErrorMsg(null);
+    try {
+      const [grievancesRes, landsRes] = await Promise.all([
+        grievanceService.getMyGrievances(),
+        landService.getMyLandRecords()
+      ]);
+      
+      if ((grievancesRes.status === 'success' || grievancesRes.success) && grievancesRes.data) {
+        setGrievances(grievancesRes.data);
+      }
+      if ((landsRes.status === 'success' || landsRes.success) && landsRes.data) {
+        setLands(landsRes.data);
+      }
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Failed to fetch grievances data.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
+
+  const handleSubmitGrievance = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!selectedLandId) {
+      setNotice('Please select a registered property.');
+      return;
+    }
     setSubmitting(true);
     setNotice(null);
 
-    setTimeout(() => {
+    try {
+      const res = await grievanceService.createGrievance({
+        land_id: selectedLandId,
+        category,
+        description: description.trim()
+      });
+
+      if (res.status === 'success' || res.success) {
+        setShowNewModal(false);
+        setDescription('');
+        setSelectedLandId('');
+        fetchDashboardData();
+      } else {
+        setNotice(res.message || 'Failed to submit grievance.');
+      }
+    } catch (err: any) {
+      setNotice(err.message || 'Error submitting grievance.');
+    } finally {
       setSubmitting(false);
-      setNotice('Backend Service Required. Grievances will be lodged directly into the database once backend is connected.');
-    }, 800);
+    }
   };
+
+  const filteredGrievances = grievances.filter((g) => {
+    const matchStatus = !statusFilter || g.status === statusFilter;
+    const matchCategory = !categoryFilter || g.category === categoryFilter;
+    return matchStatus && matchCategory;
+  });
 
   return (
     <div className="space-y-6">
@@ -35,7 +114,10 @@ export const CitizenGrievancesPage: React.FC = () => {
         </div>
 
         <button
-          onClick={() => setShowNewModal(true)}
+          onClick={() => {
+            resetForm();
+            setShowNewModal(true);
+          }}
           className="inline-flex items-center space-x-2 px-4 py-2 bg-[#034E4E] hover:bg-[#023838] text-white font-semibold text-xs rounded-lg transition-colors self-start sm:self-auto"
         >
           <Plus className="w-4 h-4" />
@@ -43,10 +125,12 @@ export const CitizenGrievancesPage: React.FC = () => {
         </button>
       </div>
 
-      <ErrorAlert
-        title="Grievance Service Status"
-        message="Submitted grievances and officer review timelines will populate live from the database when connected."
-      />
+      {errorMsg && (
+        <ErrorAlert
+          title="Backend Error"
+          message={errorMsg}
+        />
+      )}
 
       {/* Filters */}
       <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs flex flex-col sm:flex-row gap-3">
@@ -76,18 +160,64 @@ export const CitizenGrievancesPage: React.FC = () => {
             <option value="ocr_mismatch">OCR Field Mismatch</option>
             <option value="ownership_dispute">Ownership Dispute</option>
             <option value="survey_error">Survey Boundary Error</option>
-            <option value="illegal_mutation">Illegal Mutation Notice</option>
+            <option value="illegal_mutation">Unexplained Title Modification</option>
             <option value="other">Other</option>
           </select>
         </div>
       </div>
 
-      {/* Empty State */}
-      <EmptyState
-        title="No grievances submitted yet."
-        description="When you lodge a grievance for title verification or boundary resolution, it will appear here."
-        icon={<AlertOctagon className="w-6 h-6 text-slate-400" />}
-      />
+      {/* Grievances List / Empty State */}
+      {loading ? (
+        <div className="flex justify-center items-center py-12">
+          <Loader2 className="w-8 h-8 animate-spin text-[#034E4E]" />
+          <span className="ml-2 text-sm text-slate-500">Loading grievances...</span>
+        </div>
+      ) : filteredGrievances.length === 0 ? (
+        <EmptyState
+          title="No grievances submitted yet."
+          description="When you lodge a grievance for title verification or boundary resolution, it will appear here."
+          icon={<AlertOctagon className="w-6 h-6 text-slate-400" />}
+        />
+      ) : (
+        <div className="space-y-4">
+          {filteredGrievances.map((g) => (
+            <Link
+              key={g.id}
+              to={`/citizen/grievances/${g.id}`}
+              className="block bg-white rounded-2xl border border-slate-200 p-5 shadow-xs hover:shadow-md hover:border-blue-500 transition-all"
+            >
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div className="space-y-1">
+                  <div className="flex items-center space-x-2">
+                    <span className="font-bold text-slate-900 text-sm capitalize">
+                      {g.category.replace(/_/g, ' ')}
+                    </span>
+                    <span className="text-[10px] bg-slate-100 px-2 py-0.5 rounded text-slate-600 font-mono">
+                      ID: {g.id.slice(0, 8)}
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-500 leading-relaxed max-w-2xl">{g.description}</p>
+                </div>
+                
+                <div className="flex items-center space-x-3 self-end sm:self-auto shrink-0">
+                  <span className={`px-2.5 py-1 text-xs font-semibold rounded-full uppercase ${
+                    g.status === 'resolved' 
+                      ? 'bg-emerald-100 text-emerald-800' 
+                      : g.status === 'under_review' 
+                      ? 'bg-blue-100 text-blue-800' 
+                      : g.status === 'rejected'
+                      ? 'bg-rose-100 text-rose-800'
+                      : 'bg-amber-100 text-amber-800'
+                  }`}>
+                    {g.status.replace(/_/g, ' ')}
+                  </span>
+                  <ChevronRight className="w-4 h-4 text-slate-400" />
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      )}
 
       {/* Raise Grievance Modal */}
       {showNewModal && (
@@ -101,23 +231,41 @@ export const CitizenGrievancesPage: React.FC = () => {
             </div>
 
             {notice && (
-              <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-900">
+              <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-900">
                 {notice}
               </div>
             )}
 
             <form onSubmit={handleSubmitGrievance} className="space-y-4">
               <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">Select Property</label>
+                <select
+                  value={selectedLandId}
+                  onChange={(e) => setSelectedLandId(e.target.value)}
+                  required
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm"
+                >
+                  <option value="">-- Choose Registered Property --</option>
+                  {lands.map((land) => (
+                    <option key={land.id} value={land.id}>
+                      Survey No: {land.survey_number} - {land.village}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1">Grievance Category</label>
                 <select
                   value={category}
-                  onChange={(e) => setCategory(e.target.value)}
+                  onChange={(e) => setCategory(e.target.value as Grievance['category'])}
                   className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm"
                 >
                   <option value="ocr_mismatch">OCR Field Mismatch</option>
                   <option value="ownership_dispute">Ownership Dispute</option>
                   <option value="survey_error">Survey Boundary Error</option>
                   <option value="illegal_mutation">Unexplained Title Modification</option>
+                  <option value="other">Other</option>
                 </select>
               </div>
 
@@ -144,7 +292,7 @@ export const CitizenGrievancesPage: React.FC = () => {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-5 py-2 bg-blue-700 text-white text-xs font-semibold rounded-xl shadow-xs disabled:opacity-50"
+                  className="px-5 py-2 bg-[#034E4E] hover:bg-[#023838] text-white text-xs font-semibold rounded-xl shadow-xs disabled:opacity-50"
                 >
                   {submitting ? 'Submitting...' : 'Submit Grievance'}
                 </button>
@@ -155,4 +303,11 @@ export const CitizenGrievancesPage: React.FC = () => {
       )}
     </div>
   );
+
+  function resetForm() {
+    setSelectedLandId('');
+    setCategory('ocr_mismatch');
+    setDescription('');
+    setNotice(null);
+  }
 };

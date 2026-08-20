@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import {
   FileText,
@@ -10,12 +10,68 @@ import {
   ShieldAlert,
   Clock,
   Upload,
+  Loader2
 } from 'lucide-react';
 import { ErrorAlert } from '../../components/common/ErrorAlert';
 import { EmptyState } from '../../components/common/EmptyState';
+import { landService } from '../../services/landService';
+import type { LandRecord } from '../../types';
 
 export const CitizenLandRecordDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const [land, setLand] = useState<LandRecord | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchLand = async () => {
+      if (!id) return;
+      setLoading(true);
+      setErrorMsg(null);
+      try {
+        const res = await landService.getLandRecord(id);
+        if ((res.status === 'success' || res.success) && res.data) {
+          setLand(res.data);
+        } else {
+          setErrorMsg(res.message || 'Failed to fetch land record.');
+        }
+      } catch (err: any) {
+        setErrorMsg(err.message || 'Error connecting to server.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchLand();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center py-24">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-700" />
+        <span className="ml-2 text-sm text-slate-500">Loading property details...</span>
+      </div>
+    );
+  }
+
+  if (errorMsg || !land) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center space-x-3">
+          <Link
+            to="/citizen/land-records"
+            className="p-2 rounded-lg bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </Link>
+          <h1 className="text-2xl font-bold text-slate-900">Record Not Found</h1>
+        </div>
+        <ErrorAlert
+          title="Failed to Load Details"
+          message={errorMsg || 'Could not retrieve details for the specified land record.'}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -31,7 +87,7 @@ export const CitizenLandRecordDetailPage: React.FC = () => {
           <div>
             <div className="flex items-center space-x-2">
               <span className="text-xs font-semibold text-blue-700 uppercase tracking-wider">Land Title Record</span>
-              <span className="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono">ID: {id || 'RECORD-ID'}</span>
+              <span className="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono">ID: {id}</span>
             </div>
             <h1 className="text-2xl font-bold text-slate-900 mt-0.5">Property Detail View</h1>
           </div>
@@ -46,12 +102,7 @@ export const CitizenLandRecordDetailPage: React.FC = () => {
         </Link>
       </div>
 
-      <ErrorAlert
-        title="Backend Disconnected"
-        message="Full ownership details, transfer logs, and document verification history will load when connected to the backend API."
-      />
-
-      {/* 16 Core Fields Layout Grid View Placeholder */}
+      {/* 16 Core Fields Layout Grid View */}
       <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-6">
         {/* Section 1: Basic & Registration Information */}
         <div>
@@ -62,24 +113,26 @@ export const CitizenLandRecordDetailPage: React.FC = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-4 text-sm">
             <div>
               <span className="block text-xs font-medium text-slate-500">Document Type</span>
-              <span className="font-medium text-slate-800">--</span>
+              <span className="font-semibold text-slate-800">{land.document_type || 'Deed'}</span>
             </div>
             <div>
               <span className="block text-xs font-medium text-slate-500">Document Number</span>
-              <span className="font-medium text-slate-800 font-mono">--</span>
+              <span className="font-semibold text-slate-800 font-mono">{land.document_number || 'N/A'}</span>
             </div>
             <div>
               <span className="block text-xs font-medium text-slate-500">Registration Date</span>
-              <span className="font-medium text-slate-800">--</span>
+              <span className="font-semibold text-slate-800">
+                {land.registration_date ? new Date(land.registration_date).toLocaleDateString() : 'N/A'}
+              </span>
             </div>
             <div>
               <span className="block text-xs font-medium text-slate-500">Registration Office</span>
-              <span className="font-medium text-slate-800">--</span>
+              <span className="font-semibold text-slate-800">{land.registration_office || 'N/A'}</span>
             </div>
           </div>
         </div>
 
-        {/* Section 2: Property & Boundary Information */}
+        {/* Section 2: Property & Location Details */}
         <div>
           <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider pb-2 border-b border-slate-200 flex items-center space-x-2">
             <FileText className="w-4 h-4 text-blue-700" />
@@ -88,35 +141,37 @@ export const CitizenLandRecordDetailPage: React.FC = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-4 text-sm">
             <div>
               <span className="block text-xs font-medium text-slate-500">District</span>
-              <span className="font-medium text-slate-800">--</span>
+              <span className="font-semibold text-slate-800">{land.district}</span>
             </div>
             <div>
               <span className="block text-xs font-medium text-slate-500">Taluk</span>
-              <span className="font-medium text-slate-800">--</span>
+              <span className="font-semibold text-slate-800">{land.taluk}</span>
             </div>
             <div>
               <span className="block text-xs font-medium text-slate-500">Village</span>
-              <span className="font-medium text-slate-800">--</span>
+              <span className="font-semibold text-slate-800">{land.village}</span>
             </div>
             <div>
               <span className="block text-xs font-medium text-slate-500">Survey Number</span>
-              <span className="font-medium text-slate-800 font-mono">--</span>
+              <span className="font-semibold text-slate-800 font-mono">{land.survey_number}</span>
             </div>
             <div>
               <span className="block text-xs font-medium text-slate-500">Patta Number</span>
-              <span className="font-medium text-slate-800 font-mono">--</span>
+              <span className="font-semibold text-slate-800 font-mono">{land.patta_number || 'N/A'}</span>
             </div>
             <div>
               <span className="block text-xs font-medium text-slate-500">Property Extent</span>
-              <span className="font-medium text-slate-800">--</span>
+              <span className="font-semibold text-slate-800">{land.property_extent || 'N/A'}</span>
             </div>
             <div>
               <span className="block text-xs font-medium text-slate-500">Land Classification / Type</span>
-              <span className="font-medium text-slate-800">--</span>
+              <span className="font-semibold text-slate-800">{land.land_type || 'N/A'}</span>
             </div>
             <div>
               <span className="block text-xs font-medium text-slate-500">Sale Consideration (₹)</span>
-              <span className="font-medium text-slate-800">--</span>
+              <span className="font-semibold text-slate-800">
+                {land.sale_consideration ? Number(land.sale_consideration).toLocaleString('en-IN') : 'N/A'}
+              </span>
             </div>
           </div>
         </div>
@@ -130,19 +185,19 @@ export const CitizenLandRecordDetailPage: React.FC = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4 text-sm">
             <div>
               <span className="block text-xs font-medium text-slate-500">Current Owner Name</span>
-              <span className="font-medium text-slate-800">--</span>
+              <span className="font-semibold text-slate-800">{land.owner_name}</span>
             </div>
             <div>
               <span className="block text-xs font-medium text-slate-500">Previous Owner Name</span>
-              <span className="font-medium text-slate-800">--</span>
+              <span className="font-semibold text-slate-800">{land.previous_owner || 'N/A'}</span>
             </div>
             <div>
               <span className="block text-xs font-medium text-slate-500">Parent Document Reference</span>
-              <span className="font-medium text-slate-800">--</span>
+              <span className="font-semibold text-slate-800">{land.parent_document || 'N/A'}</span>
             </div>
             <div className="sm:col-span-3">
               <span className="block text-xs font-medium text-slate-500">Property Description</span>
-              <span className="font-medium text-slate-800">--</span>
+              <span className="font-semibold text-slate-800 leading-relaxed">{land.property_description || 'N/A'}</span>
             </div>
           </div>
         </div>

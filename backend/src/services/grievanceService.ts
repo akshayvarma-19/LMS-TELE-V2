@@ -8,17 +8,57 @@ export interface OfficerGrievanceFilters {
   village?: string;
 }
 
+const STATUS_UI_TO_DB: Record<string, string> = {
+  'submitted': 'Submitted',
+  'under_review': 'Under Review',
+  'info_required': 'Additional Information Required',
+  'resolved': 'Resolved',
+  'rejected': 'Rejected'
+};
+
+const STATUS_DB_TO_UI: Record<string, string> = {
+  'Submitted': 'submitted',
+  'Under Review': 'under_review',
+  'Additional Information Required': 'info_required',
+  'Resolved': 'resolved',
+  'Rejected': 'rejected'
+};
+
+function mapGrievanceStatusDbToUi(g: any) {
+  if (!g) return g;
+  return {
+    ...g,
+    status: STATUS_DB_TO_UI[g.status] || g.status
+  };
+}
+
+function mapUpdateStatusDbToUi(u: any) {
+  if (!u) return u;
+  return {
+    ...u,
+    old_status: u.old_status ? (STATUS_DB_TO_UI[u.old_status] || u.old_status) : null,
+    new_status: u.new_status ? (STATUS_DB_TO_UI[u.new_status] || u.new_status) : u.new_status
+  };
+}
+
 export const grievanceService = {
   /**
    * Verify if a land record belongs to a specific user.
    */
   async verifyLandOwnership(userId: string, landId: string): Promise<boolean> {
-    const { data, error } = await supabase
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(landId);
+    let query = supabase
       .from('land_records')
       .select('id')
-      .eq('id', landId)
-      .eq('owner_id', userId)
-      .maybeSingle();
+      .eq('owner_id', userId);
+
+    if (isUuid) {
+      query = query.eq('id', landId);
+    } else {
+      query = query.eq('land_id', landId);
+    }
+
+    const { data, error } = await query.maybeSingle();
 
     if (error) {
       throw new Error(`Ownership verification check failed: ${error.message}`);
@@ -31,25 +71,47 @@ export const grievanceService = {
    * Create a new grievance.
    */
   async createGrievance(userId: string, landId: string, category: string, description: string) {
-    // 1. Verify that the land record belongs to the citizen
-    const isOwner = await this.verifyLandOwnership(userId, landId);
-    if (!isOwner) {
+    // 1. Resolve UUID and verify ownership
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(landId);
+    let query = supabase
+      .from('land_records')
+      .select('id')
+      .eq('owner_id', userId);
+
+    if (isUuid) {
+      query = query.eq('id', landId);
+    } else {
+      query = query.eq('land_id', landId);
+    }
+
+    const { data: landRecord, error: verifyError } = await query.maybeSingle();
+
+    if (verifyError) {
+      throw new Error(`Ownership verification check failed: ${verifyError.message}`);
+    }
+
+    if (!landRecord) {
       throw new Error('Verification failed. Land record does not belong to the user or does not exist.');
     }
+
+    const resolvedLandUuid = landRecord.id;
 
     // 2. Generate a unique grievance number
     const grievanceNumber = `GRV-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
 
-    // 3. Insert grievance record
+    const dbStatus = STATUS_UI_TO_DB['submitted'];
+
+    // 3. Insert grievance record using resolved UUID
     const { data: grievance, error: insertError } = await supabase
       .from('grievances')
       .insert([
         {
           grievance_number: grievanceNumber,
-          land_id: landId,
+          land_id: resolvedLandUuid,
+          submitted_by: userId,
           category,
           description,
-          status: 'submitted'
+          status: dbStatus
         }
       ])
       .select()
@@ -66,7 +128,7 @@ export const grievanceService = {
         {
           grievance_id: grievance.id,
           old_status: null,
-          new_status: 'submitted',
+          new_status: dbStatus,
           comment: 'Grievance submitted by citizen.',
           updated_by: userId
         }
@@ -76,7 +138,7 @@ export const grievanceService = {
       console.error('Warning: Failed to create initial timeline update:', updateError.message);
     }
 
-    return grievance;
+    return mapGrievanceStatusDbToUi(grievance);
   },
 
   /**
@@ -102,7 +164,7 @@ export const grievanceService = {
     const totalPages = Math.ceil(total / limit);
 
     return {
-      records: data || [],
+      records: (data || []).map(mapGrievanceStatusDbToUi),
       pagination: {
         page,
         limit,
@@ -127,7 +189,7 @@ export const grievanceService = {
       throw new Error(`Failed to retrieve grievance: ${error.message}`);
     }
 
-    return data;
+    return mapGrievanceStatusDbToUi(data);
   },
 
   /**
@@ -165,7 +227,7 @@ export const grievanceService = {
       throw new Error(`Failed to retrieve grievance timeline: ${error.message}`);
     }
 
-    return data || [];
+    return (data || []).map(mapUpdateStatusDbToUi);
   },
 
   /**
@@ -182,7 +244,8 @@ export const grievanceService = {
 
     // Apply status and category filters if specified
     if (filters.status && filters.status.trim()) {
-      query = query.eq('status', filters.status.trim());
+      const dbStatus = STATUS_UI_TO_DB[filters.status.trim()] || filters.status.trim();
+      query = query.eq('status', dbStatus);
     }
     if (filters.category && filters.category.trim()) {
       query = query.eq('category', filters.category.trim());
@@ -214,7 +277,7 @@ export const grievanceService = {
     const totalPages = Math.ceil(total / limit);
 
     return {
-      records: data || [],
+      records: (data || []).map(mapGrievanceStatusDbToUi),
       pagination: {
         page,
         limit,
@@ -238,7 +301,7 @@ export const grievanceService = {
       throw new Error(`Failed to retrieve grievance details: ${error.message}`);
     }
 
-    return data;
+    return mapGrievanceStatusDbToUi(data);
   },
 
   /**
@@ -257,12 +320,13 @@ export const grievanceService = {
     }
 
     const oldStatus = currentGrievance.status;
+    const dbNewStatus = STATUS_UI_TO_DB[newStatus] || newStatus;
 
     // 2. Update status and officer comment in the grievances table
     const { data: updatedGrievance, error: updateGrievanceError } = await supabase
       .from('grievances')
       .update({
-        status: newStatus,
+        status: dbNewStatus,
         officer_comment: remark,
         updated_at: new Date().toISOString()
       })
@@ -281,7 +345,7 @@ export const grievanceService = {
         {
           grievance_id: id,
           old_status: oldStatus,
-          new_status: newStatus,
+          new_status: dbNewStatus,
           comment: remark,
           updated_by: officerId
         }
@@ -291,6 +355,6 @@ export const grievanceService = {
       console.error('Warning: Failed to log status change in timeline:', insertUpdateError.message);
     }
 
-    return updatedGrievance;
+    return mapGrievanceStatusDbToUi(updatedGrievance);
   }
 };

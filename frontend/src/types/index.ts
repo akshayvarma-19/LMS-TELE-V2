@@ -174,3 +174,17 @@ export interface LandSearchFilter {
   taluk?: string;
   district?: string;
 }
+
+export interface VerificationFieldResult {
+  field: string;
+  ocrValue: string | null;
+  officialValue: string | null;
+  status: 'MATCH' | 'MISMATCH' | 'NOT_AVAILABLE';
+}
+
+export interface VerificationResult {
+  overallStatus: 'MATCH' | 'MISMATCH' | 'PROCESSING' | 'OCR_FAILED';
+  mismatchCount: number;
+  canRaiseGrievance: boolean;
+  fields: VerificationFieldResult[];
+}

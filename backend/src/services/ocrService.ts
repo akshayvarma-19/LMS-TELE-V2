@@ -35,7 +35,7 @@ export const ocrService = {
 
     if (ext === '.pdf') {
       try {
-        const data = await pdfParse(buffer);
+        const data = await (pdfParse as any)(buffer);
         const text = data.text || '';
         
         if (text.trim() === '') {

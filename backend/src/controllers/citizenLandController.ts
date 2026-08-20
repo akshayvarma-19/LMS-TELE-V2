@@ -14,8 +14,8 @@ function formatLandRecord(record: any) {
     basic_information: {
       survey_number: record.survey_number,
       patta_number: record.patta_number,
-      property_extent: record.property_extent,
-      land_type: record.land_type
+      property_extent: record.property_extent || record.land_extent_acres,
+      land_type: record.land_type || record.land_classification
     },
     location: {
       district: record.district,

@@ -19,10 +19,14 @@ export interface RegisterCredentials {
 
 export const authService = {
   async login(credentials: LoginCredentials): Promise<ApiResponse<{ token?: string; user: any; session: any }>> {
-    return request<ApiResponse<{ token?: string; user: any; session: any }>>('/auth/login', {
+    const res = await request<ApiResponse<{ token?: string; user: any; session: any }>>('/auth/login', {
       method: 'POST',
       body: JSON.stringify(credentials)
     });
+    if (res.status === 'success' && res.data?.session) {
+      localStorage.setItem('supabase_session', JSON.stringify(res.data.session));
+    }
+    return res;
   },
 
   async register(credentials: RegisterCredentials): Promise<ApiResponse<{ user: any }>> {

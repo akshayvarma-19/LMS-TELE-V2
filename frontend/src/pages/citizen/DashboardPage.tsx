@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   FileText,
@@ -7,11 +7,45 @@ import {
   AlertOctagon,
   ChevronRight,
   Database,
+  Loader2
 } from 'lucide-react';
 import { ErrorAlert } from '../../components/common/ErrorAlert';
 import { EmptyState } from '../../components/common/EmptyState';
+import { landService } from '../../services/landService';
+import { grievanceService } from '../../services/grievanceService';
+import type { LandRecord, Grievance } from '../../types';
 
 export const CitizenDashboardPage: React.FC = () => {
+  const [lands, setLands] = useState<LandRecord[]>([]);
+  const [grievances, setGrievances] = useState<Grievance[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      setLoading(true);
+      setErrorMsg(null);
+      try {
+        const [landsRes, grievancesRes] = await Promise.all([
+          landService.getMyLandRecords(),
+          grievanceService.getMyGrievances()
+        ]);
+
+        if ((landsRes.status === 'success' || landsRes.success) && landsRes.data) {
+          setLands(landsRes.data);
+        }
+        if ((grievancesRes.status === 'success' || grievancesRes.success) && grievancesRes.data) {
+          setGrievances(grievancesRes.data);
+        }
+      } catch (err: any) {
+        setErrorMsg(err.message || 'Failed to connect to backend services.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchDashboardData();
+  }, []);
+
   return (
     <div className="space-y-6 bg-white text-[#1F1F1F]">
       {/* Page Heading */}
@@ -22,11 +56,12 @@ export const CitizenDashboardPage: React.FC = () => {
         </p>
       </div>
 
-      {/* System Status Message */}
-      <ErrorAlert
-        title="Data services are currently unavailable."
-        message="Your records will appear here when the service is connected."
-      />
+      {errorMsg && (
+        <ErrorAlert
+          title="Service Connection Error"
+          message={errorMsg}
+        />
+      )}
 
       {/* Quick Actions Grid (2 columns) */}
       <div>
@@ -101,7 +136,7 @@ export const CitizenDashboardPage: React.FC = () => {
       {/* Main Two-Column Layout (My Land Records & Recent Grievances) */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* LEFT: My Land Records */}
-        <div className="bg-white rounded-lg border border-[#E5E5E5] p-5">
+        <div className="bg-white rounded-lg border border-[#E5E5E5] p-5 flex flex-col">
           <div className="flex items-center justify-between pb-3 mb-3 border-b border-[#E5E5E5]">
             <h2 className="text-sm font-bold text-[#1F1F1F] flex items-center space-x-2">
               <FileText className="w-4.5 h-4.5 text-[rgb(3,78,78)]" />
@@ -113,15 +148,40 @@ export const CitizenDashboardPage: React.FC = () => {
             </Link>
           </div>
 
-          <EmptyState
-            title="No land records available."
-            description="Your registered land properties will appear here automatically once the service is connected."
-            icon={<Database className="w-5 h-5 text-[rgb(30,139,139)]" />}
-          />
+          {loading ? (
+            <div className="flex justify-center items-center py-8 flex-1">
+              <Loader2 className="w-6 h-6 animate-spin text-[rgb(3,78,78)]" />
+            </div>
+          ) : lands.length === 0 ? (
+            <EmptyState
+              title="No land records available."
+              description="Your registered land properties will appear here automatically."
+              icon={<Database className="w-5 h-5 text-[rgb(30,139,139)]" />}
+            />
+          ) : (
+            <div className="space-y-3">
+              {lands.slice(0, 3).map((land) => (
+                <Link
+                  key={land.id}
+                  to={`/citizen/land-records/${land.id}`}
+                  className="block p-3 rounded-lg border border-[#E5E5E5] hover:border-[rgb(3,78,78)] transition-all text-xs"
+                >
+                  <div className="flex justify-between items-center">
+                    <span className="font-bold text-slate-800">Survey No: {land.survey_number}</span>
+                    <span className="font-mono text-slate-500">{land.village}</span>
+                  </div>
+                  <div className="mt-1 flex justify-between text-slate-500 text-[10px]">
+                    <span>Patta: {land.patta_number || 'N/A'}</span>
+                    <span>Extent: {land.property_extent || 'N/A'}</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* RIGHT: Recent Grievances */}
-        <div className="bg-white rounded-lg border border-[#E5E5E5] p-5">
+        <div className="bg-white rounded-lg border border-[#E5E5E5] p-5 flex flex-col">
           <div className="flex items-center justify-between pb-3 mb-3 border-b border-[#E5E5E5]">
             <h2 className="text-sm font-bold text-[#1F1F1F] flex items-center space-x-2">
               <AlertOctagon className="w-4.5 h-4.5 text-[rgb(3,78,78)]" />
@@ -133,11 +193,39 @@ export const CitizenDashboardPage: React.FC = () => {
             </Link>
           </div>
 
-          <EmptyState
-            title="No grievances submitted yet."
-            description="Any grievances submitted by you will be listed here with live resolution status tracking."
-            icon={<AlertOctagon className="w-5 h-5 text-[rgb(30,139,139)]" />}
-          />
+          {loading ? (
+            <div className="flex justify-center items-center py-8 flex-1">
+              <Loader2 className="w-6 h-6 animate-spin text-[rgb(3,78,78)]" />
+            </div>
+          ) : grievances.length === 0 ? (
+            <EmptyState
+              title="No grievances submitted yet."
+              description="Any grievances submitted by you will be listed here with live resolution status tracking."
+              icon={<AlertOctagon className="w-5 h-5 text-[rgb(30,139,139)]" />}
+            />
+          ) : (
+            <div className="space-y-3">
+              {grievances.slice(0, 3).map((g) => (
+                <Link
+                  key={g.id}
+                  to={`/citizen/grievances/${g.id}`}
+                  className="block p-3 rounded-lg border border-[#E5E5E5] hover:border-[rgb(3,78,78)] transition-all text-xs"
+                >
+                  <div className="flex justify-between items-center">
+                    <span className="font-bold text-slate-800 capitalize">{g.category.replace(/_/g, ' ')}</span>
+                    <span className={`px-2 py-0.5 text-[10px] font-semibold rounded-full uppercase ${
+                      g.status === 'resolved' 
+                        ? 'bg-emerald-100 text-emerald-800' 
+                        : g.status === 'under_review' 
+                        ? 'bg-blue-100 text-blue-800' 
+                        : 'bg-amber-100 text-amber-800'
+                    }`}>{g.status.replace(/_/g, ' ')}</span>
+                  </div>
+                  <p className="mt-1 text-[#526262] text-[10px] line-clamp-1">{g.description}</p>
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Bot, Send, User, Loader2 } from 'lucide-react';
 import { ErrorAlert } from '../../components/common/ErrorAlert';
+import { assistantService } from '../../services/assistantService';
 
 interface ChatMessage {
   id: string;
@@ -14,7 +15,7 @@ export const CitizenAssistantPage: React.FC = () => {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleSend = (e: React.FormEvent) => {
+  const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim()) return;
 
@@ -26,20 +27,41 @@ export const CitizenAssistantPage: React.FC = () => {
     };
 
     setMessages((prev) => [...prev, userMsg]);
+    const currentInput = input;
     setInput('');
     setLoading(true);
 
-    // Simulate service call attempt to show clear disconnected notice
-    setTimeout(() => {
+    try {
+      const res = await assistantService.sendAssistantMessage(currentInput);
+      setLoading(false);
+
+      if (res.success && res.data?.message) {
+        const botMsg: ChatMessage = {
+          id: (Date.now() + 1).toString(),
+          sender: 'assistant',
+          text: res.data.message,
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        };
+        setMessages((prev) => [...prev, botMsg]);
+      } else {
+        const botMsg: ChatMessage = {
+          id: (Date.now() + 1).toString(),
+          sender: 'assistant',
+          text: res.error || 'AI Assistant is currently unavailable.',
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        };
+        setMessages((prev) => [...prev, botMsg]);
+      }
+    } catch (err: any) {
       setLoading(false);
       const botMsg: ChatMessage = {
         id: (Date.now() + 1).toString(),
         sender: 'assistant',
-        text: 'AI Assistant service is not connected yet. Real-time Gemini document analysis and query extraction will activate once the backend API service is connected.',
+        text: err.message || 'Failed to connect to assistant service.',
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       };
       setMessages((prev) => [...prev, botMsg]);
-    }, 600);
+    }
   };
 
   return (

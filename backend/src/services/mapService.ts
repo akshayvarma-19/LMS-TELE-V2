@@ -33,11 +33,11 @@ export const mapService = {
     const landInfo = {
       land_id: land.id,
       survey_number: land.survey_number,
-      property_extent: land.property_extent,
+      property_extent: land.land_extent_acres,
       village: land.village,
       taluk: land.taluk,
       district: land.district,
-      land_type: land.land_type,
+      land_type: land.land_classification,
       ...(isOfficer ? {
         owner_name: land.owner_name,
         document_number: land.document_number,
@@ -63,7 +63,7 @@ export const mapService = {
   async listLandsForMap(filters: MapFilters): Promise<any[]> {
     let query = supabase
       .from('land_records')
-      .select('id, survey_number, property_extent, village, taluk, district, land_type');
+      .select('id, survey_number, property_extent:land_extent_acres, village, taluk, district, land_type:land_classification');
 
     if (filters.survey_number && filters.survey_number.trim() !== '') {
       query = query.ilike('survey_number', `%${filters.survey_number.trim()}%`);

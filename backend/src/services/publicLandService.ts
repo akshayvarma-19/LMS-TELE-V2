@@ -16,7 +16,7 @@ export const publicLandService = {
     // Build initial query selecting ONLY public fields
     let query = supabase
       .from('land_records')
-      .select('survey_number, property_extent, village, taluk, district', { count: 'exact' });
+      .select('survey_number, property_extent:land_extent_acres, village, taluk, district', { count: 'exact' });
 
     // Apply filters with AND conditions
     if (filters.survey_number && filters.survey_number.trim()) {

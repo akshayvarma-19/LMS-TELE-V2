@@ -9,7 +9,10 @@ export interface AssistantMessage {
 }
 
 export const assistantService = {
-  async sendAssistantMessage(_message: string): Promise<ApiResponse<{ reply: string }>> {
-    return request<ApiResponse<{ reply: string }>>('/assistant/chat');
+  async sendAssistantMessage(message: string): Promise<ApiResponse<{ message: string }>> {
+    return request<ApiResponse<{ message: string }>>('/assistant/message', {
+      method: 'POST',
+      body: JSON.stringify({ message })
+    });
   }
 };

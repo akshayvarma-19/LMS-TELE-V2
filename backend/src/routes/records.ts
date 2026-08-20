@@ -28,7 +28,7 @@ router.post('/search', async (req: Request, res: Response): Promise<void> => {
     // Build database query selecting ONLY public non-sensitive columns
     let query = supabase
       .from('land_records')
-      .select('survey_number, property_extent, village, taluk, district')
+      .select('survey_number, property_extent:land_extent_acres, village, taluk, district')
       .ilike('survey_number', `%${survey_number.trim()}%`);
 
     if (village && typeof village === 'string' && village.trim()) {
@@ -90,7 +90,7 @@ router.get('/search', async (req: Request, res: Response): Promise<void> => {
 
     let query = supabase
       .from('land_records')
-      .select('survey_number, property_extent, village, taluk, district')
+      .select('survey_number, property_extent:land_extent_acres, village, taluk, district')
       .ilike('survey_number', `%${survey_number.trim()}%`);
 
     if (village && village.trim()) {

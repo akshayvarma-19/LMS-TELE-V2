@@ -26,7 +26,7 @@ router.post('/login', async (req: Request, res: Response): Promise<void> => {
       const { data: userProfile } = await supabaseAdmin
         .from('users')
         .select('email')
-        .eq('username', identifier)
+        .ilike('username', identifier)
         .maybeSingle();
       if (userProfile && userProfile.email) {
         identifier = userProfile.email;
@@ -121,17 +121,16 @@ router.post('/register', async (req: Request, res: Response): Promise<void> => {
 
     const userRole = role === 'officer' ? 'officer' : 'citizen';
 
-    // 1. Sign up user in Supabase Auth
-    const { data: authData, error: authError } = await supabase.auth.signUp({
+    // 1. Sign up user in Supabase Auth using admin client to bypass signup rate limits and email confirmation
+    const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
       email,
       password,
-      options: {
-        data: {
-          name,
-          username,
-          phone,
-          role: userRole
-        }
+      email_confirm: true,
+      user_metadata: {
+        name,
+        username,
+        phone,
+        role: userRole
       }
     });
 

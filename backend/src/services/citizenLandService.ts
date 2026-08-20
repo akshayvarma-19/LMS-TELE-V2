@@ -87,7 +87,7 @@ export const citizenLandService = {
   async getLandSummary(userId: string) {
     const { data, error } = await supabase
       .from('land_records')
-      .select('property_extent, village, taluk, district')
+      .select('property_extent:land_extent_acres, village, taluk, district')
       .eq('owner_id', userId);
 
     if (error) {
