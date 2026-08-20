@@ -1,4 +1,4 @@
-import { supabase } from '../lib/supabase.js';
+import { supabaseAdmin } from '../lib/supabase.js';
 
 export interface LandSearchFilters {
   survey_number?: string;
@@ -11,13 +11,12 @@ export interface LandSearchFilters {
 
 export const citizenLandService = {
   /**
-   * Fetch all land records belonging to the authenticated citizen.
+   * Fetch all land records (general registry search).
    */
   async getMyLands(userId: string) {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('land_records')
-      .select('*')
-      .eq('owner_id', userId);
+      .select('*');
 
     if (error) {
       throw new Error(`Failed to fetch land records: ${error.message}`);
@@ -27,14 +26,13 @@ export const citizenLandService = {
   },
 
   /**
-   * Fetch a single land record belonging to the authenticated citizen.
+   * Fetch details of any land record by ID.
    */
   async getLandById(userId: string, id: string) {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('land_records')
       .select('*')
       .eq('id', id)
-      .eq('owner_id', userId)
       .maybeSingle();
 
     if (error) {
@@ -45,13 +43,12 @@ export const citizenLandService = {
   },
 
   /**
-   * Search within the authenticated citizen's land records.
+   * General search across all land records in the database.
    */
   async searchLands(userId: string, filters: LandSearchFilters) {
-    let query = supabase
+    let query = supabaseAdmin
       .from('land_records')
-      .select('*')
-      .eq('owner_id', userId);
+      .select('*');
 
     if (filters.survey_number && filters.survey_number.trim()) {
       query = query.ilike('survey_number', `%${filters.survey_number.trim()}%`);
@@ -82,13 +79,12 @@ export const citizenLandService = {
   },
 
   /**
-   * Calculate summary from real database records.
+   * Calculate summary from all database records.
    */
   async getLandSummary(userId: string) {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('land_records')
-      .select('property_extent:land_extent_acres, village, taluk, district')
-      .eq('owner_id', userId);
+      .select('property_extent:land_extent_acres, village, taluk, district');
 
     if (error) {
       throw new Error(`Failed to calculate summary: ${error.message}`);
