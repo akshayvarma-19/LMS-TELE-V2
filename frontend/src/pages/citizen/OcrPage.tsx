@@ -22,7 +22,7 @@ export const CitizenOcrPage: React.FC = () => {
     const fetchLands = async () => {
       try {
         const res = await landService.getMyLandRecords();
-        if (res.status === 'success' && res.data) {
+        if ((res.success || res.status === 'success') && res.data) {
           setLands(res.data);
         }
       } catch (err: any) {
