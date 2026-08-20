@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Building2, Bell, User, LogOut, ShieldCheck, RefreshCw } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import { notificationService } from '../../services/notificationService';
 
 interface HeaderProps {
   userRole?: 'citizen' | 'officer';
@@ -9,6 +10,37 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ userRole = 'citizen', onLogout }) => {
   const navigate = useNavigate();
+  const [unreadCount, setUnreadCount] = useState<number>(0);
+
+  useEffect(() => {
+    if (userRole === 'citizen') {
+      const loadUnread = async () => {
+        try {
+          const res = await notificationService.getNotifications();
+          if ((res.success || res.status === 'success') && res.data) {
+            const count = res.data.filter((n: any) => !n.is_read).length;
+            setUnreadCount(count);
+          }
+        } catch (e) {
+          // Suppress background errors
+        }
+      };
+
+      loadUnread();
+
+      const handleUpdate = (e: Event) => {
+        const detail = (e as CustomEvent).detail;
+        if (detail && typeof detail.unreadCount === 'number') {
+          setUnreadCount(detail.unreadCount);
+        }
+      };
+
+      window.addEventListener('notifications-updated', handleUpdate);
+      return () => {
+        window.removeEventListener('notifications-updated', handleUpdate);
+      };
+    }
+  }, [userRole]);
 
   const handlePortalSwitch = () => {
     if (userRole === 'citizen') {
@@ -42,12 +74,18 @@ export const Header: React.FC<HeaderProps> = ({ userRole = 'citizen', onLogout }
           {/* Right Controls */}
           <div className="flex items-center space-x-2 sm:space-x-3">
             {/* Notification Bell */}
-            <div className="relative p-2 rounded-lg text-[#667085] hover:text-[#034E4E] hover:bg-[#F4F8F7] transition-colors cursor-pointer" title="Notifications">
+            <Link
+              to="/citizen/notifications"
+              className="relative p-2 rounded-lg text-[#667085] hover:text-[#034E4E] hover:bg-[#F4F8F7] transition-colors"
+              title="Notifications"
+            >
               <Bell className="w-4.5 h-4.5" />
-              <span className="absolute top-1.5 right-1.5 w-3.5 h-3.5 bg-[#034E4E] text-white text-[9px] font-extrabold rounded-full flex items-center justify-center border border-white">
-                3
-              </span>
-            </div>
+              {userRole === 'citizen' && unreadCount > 0 && (
+                <span className="absolute top-1.5 right-1.5 w-3.5 h-3.5 bg-[#DC2626] text-white text-[9px] font-extrabold rounded-full flex items-center justify-center border border-white">
+                  {unreadCount}
+                </span>
+              )}
+            </Link>
 
             {/* Portal Switcher Button */}
             <button

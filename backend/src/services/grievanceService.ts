@@ -1,4 +1,5 @@
 import { supabase } from '../lib/supabase.js';
+import { notificationService } from './notificationService.js';
 
 export interface OfficerGrievanceFilters {
   status?: string;
@@ -136,6 +137,20 @@ export const grievanceService = {
 
     if (updateError) {
       console.error('Warning: Failed to create initial timeline update:', updateError.message);
+    }
+
+    // Trigger notification for successful grievance submission
+    try {
+      await notificationService.createNotification(
+        userId,
+        'grievance',
+        'Grievance Submitted',
+        `Your grievance petition ${grievanceNumber} has been successfully submitted and is under review.`,
+        'grievances',
+        grievance.id
+      );
+    } catch (e: any) {
+      console.error('Warning: Failed to create grievance submission notification:', e.message);
     }
 
     return mapGrievanceStatusDbToUi(grievance);
@@ -353,6 +368,22 @@ export const grievanceService = {
 
     if (insertUpdateError) {
       console.error('Warning: Failed to log status change in timeline:', insertUpdateError.message);
+    }
+
+    // Trigger notification for grievance update to the citizen who filed it
+    try {
+      const citizenId = updatedGrievance.submitted_by;
+      const statusUi = newStatus.replace(/_/g, ' ');
+      await notificationService.createNotification(
+        citizenId,
+        'grievance',
+        'Grievance Status Updated',
+        `Your grievance petition ${updatedGrievance.grievance_number} has been marked as '${statusUi}' by the officer. Remark: "${remark}"`,
+        'grievances',
+        id
+      );
+    } catch (e: any) {
+      console.error('Warning: Failed to create grievance status update notification:', e.message);
     }
 
     return mapGrievanceStatusDbToUi(updatedGrievance);

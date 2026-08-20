@@ -121,6 +121,21 @@ export const ocrService = {
         throw new Error(`Failed to save extracted data: ${updateError.message}`);
       }
 
+      // Trigger notification for successful OCR completion
+      try {
+        const { notificationService } = await import('./notificationService.js');
+        await notificationService.createNotification(
+          citizenId,
+          'ocr',
+          'OCR Extraction Completed',
+          `OCR processing for deed "${document.file_name}" completed successfully. You can now review mismatches.`,
+          'land_documents',
+          id
+        );
+      } catch (e: any) {
+        console.error('Warning: Failed to create OCR completion notification:', e.message);
+      }
+
       return updatedDoc;
     } catch (err: any) {
       console.error('OCR processing error for document ID:', id, err);
@@ -133,6 +148,21 @@ export const ocrService = {
           updated_at: new Date().toISOString()
         })
         .eq('id', id);
+
+      // Trigger notification for failed OCR processing
+      try {
+        const { notificationService } = await import('./notificationService.js');
+        await notificationService.createNotification(
+          citizenId,
+          'ocr',
+          'OCR Extraction Failed',
+          `OCR processing for document "${document.file_name}" failed. Please ensure the file is readable and try again.`,
+          'land_documents',
+          id
+        );
+      } catch (e: any) {
+        console.error('Warning: Failed to create OCR failure notification:', e.message);
+      }
 
       throw err;
     }

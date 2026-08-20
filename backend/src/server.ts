@@ -12,6 +12,7 @@ import officerGrievanceRouter from './routes/officerGrievanceRoutes.js';
 import ocrExtractionRouter from './routes/ocrExtractionRoutes.js';
 import assistantRouter from './routes/assistantRoutes.js';
 import mapRouter from './routes/mapRoutes.js';
+import notificationRouter from './routes/notificationRoutes.js';
 
 dotenv.config();
 
@@ -37,6 +38,7 @@ app.use('/api/officer/grievances', officerGrievanceRouter);
 app.use('/api/citizen/ocr', ocrExtractionRouter);
 app.use('/api/assistant', assistantRouter);
 app.use('/api/map', mapRouter);
+app.use('/api/notifications', notificationRouter);
 
 
 
