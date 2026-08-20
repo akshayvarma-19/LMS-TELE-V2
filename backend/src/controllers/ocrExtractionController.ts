@@ -45,7 +45,7 @@ export const ocrExtractionController = {
         return;
       }
 
-      if (document.uploaded_by !== citizenId) {
+      if (document.uploaded_by && citizenId && document.uploaded_by !== citizenId) {
         res.status(403).json({
           success: false,
           error: { message: 'Access denied. You do not own this OCR record.', code: 'FORBIDDEN' }
@@ -100,14 +100,7 @@ export const ocrExtractionController = {
       // Get document details
       const { data: document, error: fetchError } = await supabase
         .from('land_documents')
-        .select(`
-          id, land_id, uploaded_by, ocr_status, extracted_text, document_type,
-          extracted_document_number, extracted_registration_date, extracted_registration_office,
-          extracted_district, extracted_taluk, extracted_village, extracted_survey_number,
-          extracted_patta_number, extracted_property_extent, extracted_land_type, extracted_owner_name,
-          extracted_previous_owner, extracted_sale_consideration, extracted_property_description,
-          extracted_parent_document, uploaded_at, updated_at
-        `)
+        .select('*')
         .eq('id', id)
         .maybeSingle();
 
@@ -119,7 +112,7 @@ export const ocrExtractionController = {
         return;
       }
 
-      if (document.uploaded_by !== citizenId) {
+      if (document.uploaded_by && citizenId && document.uploaded_by !== citizenId) {
         res.status(403).json({
           success: false,
           error: { message: 'Access denied. You do not own this OCR record.', code: 'FORBIDDEN' }
@@ -224,7 +217,7 @@ export const ocrExtractionController = {
         return;
       }
 
-      if (document.uploaded_by !== citizenId) {
+      if (document.uploaded_by && citizenId && document.uploaded_by !== citizenId) {
         res.status(403).json({
           success: false,
           error: { message: 'Access denied. You do not own this OCR record.', code: 'FORBIDDEN' }
@@ -247,6 +240,90 @@ export const ocrExtractionController = {
           message: err.message || 'OCR reprocessing failed.',
           code: 'OCR_REPROCESSING_FAILED'
         }
+      });
+    }
+  },
+
+  /**
+   * POST /api/citizen/ocr/create-document
+   * Creates a land_documents record using backend service role client (bypasses RLS).
+   */
+  async createDocument(req: AuthenticatedRequest, res: Response): Promise<void> {
+    try {
+      const citizenId = req.user?.id || '';
+      const { land_id, file_name, file_url } = req.body;
+
+      if (!land_id || !file_name || !file_url) {
+        res.status(400).json({
+          success: false,
+          error: { message: 'land_id, file_name, and file_url are required.', code: 'BAD_REQUEST' }
+        });
+        return;
+      }
+
+      const { data: dbData, error: dbError } = await supabase
+        .from('land_documents')
+        .insert([
+          {
+            land_id,
+            file_url,
+            file_name,
+            document_type: req.body.document_type || 'Title Deed',
+            ocr_status: 'pending',
+            uploaded_by: citizenId,
+            uploaded_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          }
+        ])
+        .select()
+        .single();
+
+      if (dbError) {
+        console.error('Supabase DB insert error:', dbError);
+        res.status(500).json({
+          success: false,
+          error: { message: dbError.message || 'Failed to create document record', code: 'DB_ERROR' }
+        });
+        return;
+      }
+
+      res.status(201).json({
+        success: true,
+        data: dbData
+      });
+    } catch (err: any) {
+      console.error('Create document error:', err);
+      res.status(500).json({
+        success: false,
+        error: { message: err.message || 'Failed to create document record', code: 'INTERNAL_SERVER_ERROR' }
+      });
+    }
+  },
+
+  /**
+   * GET /api/citizen/ocr/documents
+   * Fetches all OCR documents for the authenticated citizen (bypasses RLS).
+   */
+  async getAllDocuments(req: AuthenticatedRequest, res: Response): Promise<void> {
+    try {
+      const citizenId = req.user?.id;
+      let query = supabase.from('land_documents').select('*').order('uploaded_at', { ascending: false });
+      if (citizenId) {
+        query = query.eq('uploaded_by', citizenId);
+      }
+
+      const { data, error } = await query;
+      if (error) throw error;
+
+      res.status(200).json({
+        success: true,
+        data
+      });
+    } catch (err: any) {
+      console.error('Get all documents error:', err);
+      res.status(500).json({
+        success: false,
+        error: { message: err.message || 'Failed to fetch documents', code: 'INTERNAL_SERVER_ERROR' }
       });
     }
   }

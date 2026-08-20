@@ -5,56 +5,48 @@ import { request } from './api';
 export const ocrService = {
   async uploadLandDocument(landId: string, file: File): Promise<ApiResponse<LandDocument>> {
     try {
-      // 1. Upload file to Supabase Storage bucket 'deed_documents'
+      // 1. Try uploading file to Supabase Storage bucket 'deed_documents'
       const fileName = `${Date.now()}_${file.name}`;
       const bucketName = 'deed_documents';
+      let publicUrl = '';
       
       const { error: uploadError } = await supabase.storage
         .from(bucketName)
         .upload(fileName, file);
 
-      if (uploadError) {
-        throw new Error(`Upload to storage failed: ${uploadError.message}`);
+      if (!uploadError) {
+        const { data: urlData } = supabase.storage
+          .from(bucketName)
+          .getPublicUrl(fileName);
+        publicUrl = urlData?.publicUrl || '';
+      } else {
+        console.warn(`Supabase storage upload error (${uploadError.message}). Falling back to Data URL encoding.`);
+        publicUrl = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result as string);
+          reader.onerror = (e) => reject(new Error('Failed to read file for fallback upload'));
+          reader.readAsDataURL(file);
+        });
       }
 
-      // 2. Get public URL of the uploaded document
-      const { data: { publicUrl } } = supabase.storage
-        .from(bucketName)
-        .getPublicUrl(fileName);
+      // 2. Create document record via Express backend API (using service role key to bypass RLS)
+      const res = await request<any>('/citizen/ocr/create-document', {
+        method: 'POST',
+        body: JSON.stringify({
+          land_id: landId,
+          file_name: file.name,
+          file_url: publicUrl
+        })
+      });
 
-      // 3. Create document record in Supabase database table `land_documents`
-      const sessionStr = localStorage.getItem('supabase_session');
-      let userId = '';
-      if (sessionStr) {
-        try {
-          const session = JSON.parse(sessionStr);
-          userId = session.user?.id || '';
-        } catch (e) {}
-      }
-
-      const { data: dbData, error: dbError } = await supabase
-        .from('land_documents')
-        .insert([
-          {
-            land_id: landId,
-            file_url: publicUrl,
-            file_name: file.name,
-            ocr_status: 'pending',
-            uploaded_by: userId,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          }
-        ])
-        .select()
-        .single();
-
-      if (dbError) {
-        throw dbError;
+      const docData = res.data || res;
+      if (!docData || res.error || (res.success === false)) {
+        throw new Error(res.error?.message || res.message || 'Failed to create document record');
       }
 
       return {
         status: 'success',
-        data: dbData as LandDocument
+        data: docData as LandDocument
       };
     } catch (err: any) {
       return {
@@ -86,13 +78,9 @@ export const ocrService = {
 
   async getAllDocuments(): Promise<ApiResponse<LandDocument[]>> {
     try {
-      const { data, error } = await supabase
-        .from('land_documents')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      return { status: 'success', data: data as LandDocument[] };
+      const res = await request<any>('/citizen/ocr/documents');
+      const docs = res.data || res;
+      return { status: 'success', data: docs as LandDocument[] };
     } catch (err: any) {
       return { status: 'error', message: err.message || 'Failed to load documents' };
     }

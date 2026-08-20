@@ -8,6 +8,10 @@ const router = Router();
 router.use(authenticateToken as any);
 router.use(requireCitizen as any);
 
+// 0. POST /api/citizen/ocr/create-document & GET /api/citizen/ocr/documents
+router.post('/create-document', ocrExtractionController.createDocument as any);
+router.get('/documents', ocrExtractionController.getAllDocuments as any);
+
 // 1. POST /api/citizen/ocr/:id/extract
 router.post('/:id/extract', ocrExtractionController.extractOcr as any);
 
