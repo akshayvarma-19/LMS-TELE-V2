@@ -24,7 +24,7 @@ export const ocrService = {
         publicUrl = await new Promise<string>((resolve, reject) => {
           const reader = new FileReader();
           reader.onload = () => resolve(reader.result as string);
-          reader.onerror = (e) => reject(new Error('Failed to read file for fallback upload'));
+          reader.onerror = () => reject(new Error('Failed to read file for fallback upload'));
           reader.readAsDataURL(file);
         });
       }

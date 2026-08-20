@@ -53,7 +53,7 @@ export const OfficerEditLandRecordPage: React.FC = () => {
             land_type: res.data.land_type || 'Wet Land (Nanjai)',
             owner_name: res.data.owner_name || '',
             previous_owner: res.data.previous_owner || '',
-            sale_consideration: res.data.sale_consideration || '',
+            sale_consideration: res.data.sale_consideration !== undefined && res.data.sale_consideration !== null ? String(res.data.sale_consideration) : '',
             property_description: res.data.property_description || '',
             parent_document: res.data.parent_document || '',
           });

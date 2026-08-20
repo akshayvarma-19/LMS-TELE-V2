@@ -10,10 +10,12 @@ import {
   ShieldAlert,
   Clock,
   Upload,
-  Loader2
+  Loader2,
+  Globe
 } from 'lucide-react';
 import { ErrorAlert } from '../../components/common/ErrorAlert';
 import { EmptyState } from '../../components/common/EmptyState';
+import { Land3DMap } from '../../components/common/Land3DMap';
 import { landService } from '../../services/landService';
 import type { LandRecord } from '../../types';
 
@@ -22,6 +24,7 @@ export const CitizenLandRecordDetailPage: React.FC = () => {
   const [land, setLand] = useState<LandRecord | null>(null);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [show3DMap, setShow3DMap] = useState(false);
 
   useEffect(() => {
     const fetchLand = async () => {
@@ -43,6 +46,14 @@ export const CitizenLandRecordDetailPage: React.FC = () => {
     };
     fetchLand();
   }, [id]);
+
+  const handleOpen3DMap = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setShow3DMap(true);
+    setTimeout(() => {
+      document.getElementById('3d-map-section')?.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
+  };
 
   if (loading) {
     return (
@@ -93,13 +104,23 @@ export const CitizenLandRecordDetailPage: React.FC = () => {
           </div>
         </div>
 
-        <Link
-          to="/citizen/ocr"
-          className="tracia-btn-primary inline-flex items-center space-x-2 text-xs"
-        >
-          <Upload className="w-4 h-4" />
-          <span>Verify with Document OCR</span>
-        </Link>
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={handleOpen3DMap}
+            className="px-4 py-2 bg-[#034E4E] hover:bg-[#023B3B] text-white rounded-xl text-xs font-semibold flex items-center space-x-1.5 transition-colors shadow-xs cursor-pointer"
+          >
+            <Globe className="w-4 h-4" />
+            <span>{show3DMap ? 'Scroll to 3D Map' : 'View in 3D Map'}</span>
+          </button>
+
+          <Link
+            to="/citizen/ocr"
+            className="tracia-btn-primary inline-flex items-center space-x-2 text-xs"
+          >
+            <Upload className="w-4 h-4" />
+            <span>Verify with Document OCR</span>
+          </Link>
+        </div>
       </div>
 
       {/* 16 Core Fields Layout Grid View */}
@@ -202,6 +223,35 @@ export const CitizenLandRecordDetailPage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* 3D Geospatial Map Section */}
+      {show3DMap && (
+        <div id="3d-map-section" className="scroll-mt-6 space-y-2">
+          <div className="flex items-center justify-between">
+            <h3 className="text-xs font-extrabold text-[#034E4E] uppercase tracking-wider flex items-center space-x-2">
+              <Globe className="w-4 h-4 text-[#034E4E]" />
+              <span>TRACIA 3D Geospatial Globe View</span>
+            </h3>
+            <button
+              onClick={() => setShow3DMap(false)}
+              className="text-xs text-slate-500 hover:text-slate-700 underline cursor-pointer"
+            >
+              Hide 3D Map
+            </button>
+          </div>
+          <Land3DMap
+            latitude={land.latitude}
+            longitude={land.longitude}
+            surveyNumber={land.survey_number}
+            pattaNumber={land.patta_number}
+            village={land.village}
+            taluk={land.taluk}
+            district={land.district}
+            propertyExtent={land.property_extent}
+            landType={land.land_type}
+          />
+        </div>
+      )}
 
       {/* Detail Tabs / Sections */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

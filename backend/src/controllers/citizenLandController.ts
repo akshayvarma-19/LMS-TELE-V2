@@ -20,7 +20,9 @@ function formatLandRecord(record: any) {
     location: {
       district: record.district,
       taluk: record.taluk,
-      village: record.village
+      village: record.village,
+      latitude: record.latitude ?? null,
+      longitude: record.longitude ?? null
     },
     registration: {
       document_type: record.document_type,
@@ -39,6 +41,8 @@ function formatLandRecord(record: any) {
     description: {
       property_description: record.property_description
     },
+    latitude: record.latitude ?? null,
+    longitude: record.longitude ?? null,
     created_at: record.created_at,
     updated_at: record.updated_at
   };

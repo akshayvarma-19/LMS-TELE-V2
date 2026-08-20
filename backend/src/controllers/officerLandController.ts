@@ -22,7 +22,9 @@ const ALLOWED_FIELDS = [
   'previous_owner',
   'sale_consideration',
   'property_description',
-  'parent_document'
+  'parent_document',
+  'latitude',
+  'longitude'
 ];
 
 /**
@@ -40,7 +42,9 @@ function formatOfficerLandRecord(record: any) {
     location: {
       district: record.district,
       taluk: record.taluk,
-      village: record.village
+      village: record.village,
+      latitude: record.latitude ?? null,
+      longitude: record.longitude ?? null
     },
     registration: {
       document_type: record.document_type,
@@ -65,7 +69,9 @@ function formatOfficerLandRecord(record: any) {
       land_id: record.land_id,
       created_at: record.created_at,
       updated_at: record.updated_at
-    }
+    },
+    latitude: record.latitude ?? null,
+    longitude: record.longitude ?? null
   };
 }
 

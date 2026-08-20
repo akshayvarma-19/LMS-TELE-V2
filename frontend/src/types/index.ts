@@ -30,6 +30,8 @@ export interface LandRecord {
   sale_consideration: number | string;
   property_description: string;
   parent_document: string;
+  latitude?: number;
+  longitude?: number;
   created_at: string;
   updated_at: string;
 }

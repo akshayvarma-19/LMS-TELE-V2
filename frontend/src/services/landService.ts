@@ -26,6 +26,8 @@ function flattenLandRecord(item: any): LandRecord {
     sale_consideration: item.transaction_information?.sale_consideration || '',
     property_description: item.description?.property_description || '',
     parent_document: item.transaction_information?.parent_document || '',
+    latitude: item.latitude || item.location?.latitude,
+    longitude: item.longitude || item.location?.longitude,
     created_at: item.created_at || item.system_information?.created_at || '',
     updated_at: item.updated_at || item.system_information?.updated_at || ''
   };

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Bell, FileText, MessageSquare, Scan, Check, Loader2, AlertTriangle, Sparkles } from 'lucide-react';
+import { Bell, FileText, MessageSquare, Scan, Check, Loader2, Sparkles } from 'lucide-react';
 import { notificationService } from '../../services/notificationService';
 import type { Notification } from '../../types';
 import { ErrorAlert } from '../../components/common/ErrorAlert';
