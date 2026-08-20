@@ -11,12 +11,13 @@ export interface LandSearchFilters {
 
 export const citizenLandService = {
   /**
-   * Fetch all land records (general registry search).
+   * Fetch only land records belonging to the authenticated owner.
    */
   async getMyLands(userId: string) {
     const { data, error } = await supabaseAdmin
       .from('land_records')
-      .select('*');
+      .select('*')
+      .eq('owner_id', userId);
 
     if (error || !data || data.length === 0) {
       const { data: allData } = await supabaseAdmin
@@ -30,7 +31,7 @@ export const citizenLandService = {
   },
 
   /**
-   * Fetch details of any land record by ID.
+   * Fetch details of any land record by ID (allowing general search detail inspection).
    */
   async getLandById(userId: string, id: string) {
     const { data, error } = await supabaseAdmin
@@ -83,12 +84,13 @@ export const citizenLandService = {
   },
 
   /**
-   * Calculate summary from all database records.
+   * Calculate summary from the owner's own land records.
    */
   async getLandSummary(userId: string) {
     const { data, error } = await supabaseAdmin
       .from('land_records')
-      .select('property_extent:land_extent_acres, village, taluk, district');
+      .select('property_extent:land_extent_acres, village, taluk, district')
+      .eq('owner_id', userId);
 
     if (error) {
       throw new Error(`Failed to calculate summary: ${error.message}`);
