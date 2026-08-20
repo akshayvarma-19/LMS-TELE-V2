@@ -12,6 +12,7 @@ import { CitizenDashboardPage } from './pages/citizen/DashboardPage';
 import { CitizenLandRecordsPage } from './pages/citizen/LandRecordsPage';
 import { CitizenLandRecordDetailPage } from './pages/citizen/LandRecordDetailPage';
 import { PublicSearchPage } from './pages/citizen/PublicSearchPage';
+import { CitizenApplicationsPage } from './pages/citizen/CitizenApplicationsPage';
 import { CitizenOcrPage } from './pages/citizen/OcrPage';
 import { CitizenGrievancesPage } from './pages/citizen/GrievancesPage';
 import { CitizenGrievanceDetailPage } from './pages/citizen/GrievanceDetailPage';
@@ -26,6 +27,8 @@ import { OfficerLandRecordsPage } from './pages/officer/OfficerLandRecordsPage';
 import { OfficerLandRecordDetailPage } from './pages/officer/OfficerLandRecordDetailPage';
 import { OfficerAddLandRecordPage } from './pages/officer/OfficerAddLandRecordPage';
 import { OfficerEditLandRecordPage } from './pages/officer/OfficerEditLandRecordPage';
+import { OfficerApplicationsPage } from './pages/officer/OfficerApplicationsPage';
+import { OfficerApplicationDetailPage } from './pages/officer/OfficerApplicationDetailPage';
 import { OfficerGrievancesPage } from './pages/officer/OfficerGrievancesPage';
 import { OfficerGrievanceDetailPage } from './pages/officer/OfficerGrievanceDetailPage';
 import { OfficerDocumentsPage } from './pages/officer/OfficerDocumentsPage';
@@ -44,6 +47,7 @@ export function App() {
           <Route path="land-records" element={<CitizenLandRecordsPage />} />
           <Route path="land-records/:id" element={<CitizenLandRecordDetailPage />} />
           <Route path="search" element={<PublicSearchPage />} />
+          <Route path="applications" element={<CitizenApplicationsPage />} />
           <Route path="ocr" element={<CitizenOcrPage />} />
           <Route path="grievances" element={<CitizenGrievancesPage />} />
           <Route path="grievances/:id" element={<CitizenGrievanceDetailPage />} />
@@ -61,6 +65,8 @@ export function App() {
           <Route path="land-records/new" element={<OfficerAddLandRecordPage />} />
           <Route path="land-records/:id" element={<OfficerLandRecordDetailPage />} />
           <Route path="land-records/:id/edit" element={<OfficerEditLandRecordPage />} />
+          <Route path="applications" element={<OfficerApplicationsPage />} />
+          <Route path="applications/:id" element={<OfficerApplicationDetailPage />} />
           <Route path="grievances" element={<OfficerGrievancesPage />} />
           <Route path="grievances/:id" element={<OfficerGrievanceDetailPage />} />
           <Route path="documents" element={<OfficerDocumentsPage />} />
