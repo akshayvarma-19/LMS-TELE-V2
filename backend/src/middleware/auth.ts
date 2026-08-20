@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { supabase } from '../lib/supabase.js';
+import { supabase, supabaseAdmin } from '../lib/supabase.js';
 
 export interface AuthenticatedRequest extends Request {
   user?: any;
@@ -32,6 +32,37 @@ export async function authenticateToken(req: Request, res: Response, next: NextF
         }
       });
       return;
+    }
+
+    // Fetch the corresponding profile from public.users to map original database ID and role
+    if (user.email) {
+      const { data: dbUser } = await supabaseAdmin
+        .from('users')
+        .select('*')
+        .eq('email', user.email)
+        .maybeSingle();
+
+      if (dbUser) {
+        // If account is deactivated, deny access
+        if (dbUser.is_active === false) {
+          res.status(403).json({
+            success: false,
+            error: {
+              message: 'Access denied. Your account is deactivated.',
+              code: 'FORBIDDEN'
+            }
+          });
+          return;
+        }
+
+        // Map database values back to req.user object so that database queries mapping records
+        // to public.users.id remain fully functional without modifying tables.
+        user.id = dbUser.id;
+        if (!user.user_metadata) {
+          user.user_metadata = {};
+        }
+        user.user_metadata.role = dbUser.role;
+      }
     }
 
     (req as any).user = user;

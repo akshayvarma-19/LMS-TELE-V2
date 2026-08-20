@@ -10,60 +10,88 @@ const router = Router();
  */
 router.post('/login', async (req: Request, res: Response): Promise<void> => {
   try {
-    const { username, email, password } = req.body;
-    const identifier = username || email;
+    const { email, username, password } = req.body;
+    let identifier = email || username;
 
     if (!identifier || !password) {
       res.status(400).json({
         status: 'error',
-        message: 'Username/Email and password are required'
+        message: 'Email/Username and password are required'
       });
       return;
     }
 
-    let authData = null;
-    let authError = null;
-
-    if (identifier.includes('@')) {
-      const resAuth = await supabase.auth.signInWithPassword({
-        email: identifier,
-        password: password,
-      });
-      authData = resAuth.data;
-      authError = resAuth.error;
-    } else {
-      // Lookup email by username from custom users/profiles table if available
+    // 1. If username was provided, look up the email from public.users table
+    if (!identifier.includes('@')) {
       const { data: userProfile } = await supabaseAdmin
         .from('users')
-        .select('*')
-        .or(`username.eq.${identifier},email.eq.${identifier}`)
+        .select('email')
+        .eq('username', identifier)
         .maybeSingle();
-
-
-      const userEmail = userProfile?.email || identifier;
-
-      const resAuth = await supabase.auth.signInWithPassword({
-        email: userEmail,
-        password: password,
-      });
-      authData = resAuth.data;
-      authError = resAuth.error;
+      if (userProfile && userProfile.email) {
+        identifier = userProfile.email;
+      }
     }
 
-    if (authError) {
+    // 2. Authenticate using Supabase Auth.
+    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+      email: identifier,
+      password: password,
+    });
+
+    if (authError || !authData?.user) {
       res.status(401).json({
         status: 'error',
-        message: authError.message || 'Invalid username or password'
+        message: authError?.message || 'Invalid email/username or password'
       });
       return;
     }
 
+    // 3. Obtain the authenticated user's email/ID.
+    const authEmail = authData.user.email;
+
+    // 4. Find the corresponding existing record in public.users using the email.
+    const { data: appUser, error: dbError } = await supabaseAdmin
+      .from('users')
+      .select('*')
+      .eq('email', authEmail)
+      .maybeSingle();
+
+    if (dbError || !appUser) {
+      res.status(401).json({
+        status: 'error',
+        message: 'No corresponding user profile found in the database.'
+      });
+      return;
+    }
+
+    // 9. If public.users.is_active is false, deny application access.
+    if (appUser.is_active === false) {
+      res.status(403).json({
+        status: 'error',
+        message: 'Your account is deactivated'
+      });
+      return;
+    }
+
+    // 5. Read username, role, phone and is_active from public.users.
+    // 6. Return the authenticated user and application role to the frontend.
     res.json({
       status: 'success',
       message: 'Login successful',
       data: {
-        user: authData.user,
-        session: authData.session
+        user: {
+          ...authData.user,
+          // Merge database profile properties
+          id: appUser.id, // Keep the original database ID for application context
+          username: appUser.username,
+          phone: appUser.phone,
+          role: appUser.role,
+          is_active: appUser.is_active !== false,
+          name: appUser.name
+        },
+        session: authData.session,
+        role: appUser.role
       }
     });
   } catch (err: any) {
