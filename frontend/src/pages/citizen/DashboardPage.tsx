@@ -7,7 +7,10 @@ import {
   AlertOctagon,
   ChevronRight,
   Database,
-  Loader2
+  Loader2,
+  ArrowRight,
+  Bot,
+  Map
 } from 'lucide-react';
 import { ErrorAlert } from '../../components/common/ErrorAlert';
 import { EmptyState } from '../../components/common/EmptyState';
