@@ -36,7 +36,7 @@ export const CitizenGrievancesPage: React.FC = () => {
 
         <button
           onClick={() => setShowNewModal(true)}
-          className="inline-flex items-center space-x-2 px-4 py-2 bg-blue-700 hover:bg-blue-600 text-white font-semibold text-xs rounded-xl shadow-xs transition-colors self-start sm:self-auto"
+          className="inline-flex items-center space-x-2 px-4 py-2 bg-[#034E4E] hover:bg-[#023838] text-white font-semibold text-xs rounded-lg transition-colors self-start sm:self-auto"
         >
           <Plus className="w-4 h-4" />
           <span>Raise New Grievance</span>

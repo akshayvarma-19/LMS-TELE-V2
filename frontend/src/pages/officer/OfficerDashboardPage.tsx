@@ -17,31 +17,31 @@ export const OfficerDashboardPage: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Officer Header */}
-      <div className="bg-slate-900 text-white rounded-2xl p-6 sm:p-8 shadow-md border border-slate-800">
+      <div className="bg-white text-[#111827] rounded-xl p-6 sm:p-8 border border-[#D9E3E3]">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center space-x-2">
-              <Shield className="w-4 h-4 text-amber-400" />
-              <span className="text-xs font-semibold text-amber-400 uppercase tracking-wider">Revenue Officer Admin</span>
+              <Shield className="w-4 h-4 text-[#034E4E]" />
+              <span className="text-xs font-semibold text-[#034E4E] uppercase tracking-wider">TRACIA Revenue Officer Admin</span>
             </div>
-            <h1 className="text-2xl font-bold text-white mt-1">Land Records Administration</h1>
-            <p className="text-slate-400 text-sm mt-1 max-w-xl">
+            <h1 className="text-2xl font-extrabold text-[#034E4E] mt-1">Land Records Administration</h1>
+            <p className="text-[#526262] text-sm mt-1 max-w-xl">
               Inspect registered land titles, manage citizen grievances, execute mutation records, and review document OCR verifications.
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
             <Link
               to="/officer/land-records/new"
-              className="inline-flex items-center space-x-2 px-4 py-2 rounded-xl bg-blue-700 hover:bg-blue-600 text-white text-xs font-semibold shadow-sm transition-colors"
+              className="inline-flex items-center space-x-2 px-4 py-2 rounded-lg bg-[#034E4E] hover:bg-[#023838] text-white text-xs font-semibold transition-colors"
             >
               <PlusCircle className="w-4 h-4" />
               <span>Add Land Record</span>
             </Link>
             <Link
               to="/officer/grievances"
-              className="inline-flex items-center space-x-2 px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs font-semibold transition-colors"
+              className="inline-flex items-center space-x-2 px-4 py-2 rounded-lg bg-white hover:bg-[#F8FAFA] border border-[#D9E3E3] text-[#034E4E] text-xs font-semibold transition-colors"
             >
-              <AlertOctagon className="w-4 h-4 text-amber-400" />
+              <AlertOctagon className="w-4 h-4 text-[#034E4E]" />
               <span>Review Grievances</span>
             </Link>
           </div>

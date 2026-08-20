@@ -15,12 +15,12 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   action,
 }) => {
   return (
-    <div className="flex flex-col items-center justify-center p-8 text-center rounded-lg bg-white border border-[#D9E0E8] my-3">
-      <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 mb-3">
+    <div className="flex flex-col items-center justify-center p-8 text-center rounded-lg bg-white border border-[#E5E5E5] my-3">
+      <div className="w-10 h-10 rounded-full bg-white border border-[#E5E5E5] flex items-center justify-center text-[rgb(30,139,139)] mb-3">
         {icon || <Database className="w-5 h-5" />}
       </div>
-      <h3 className="text-sm font-semibold text-[#0F172A] mb-1">{title}</h3>
-      <p className="text-xs text-[#64748B] max-w-sm mb-3">{description}</p>
+      <h3 className="text-sm font-semibold text-[#1F1F1F] mb-1">{title}</h3>
+      <p className="text-xs text-[#1F1F1F]/70 max-w-sm mb-3">{description}</p>
       {action && <div className="mt-1">{action}</div>}
     </div>
   );

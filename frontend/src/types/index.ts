@@ -161,7 +161,8 @@ export interface AuditLog {
 }
 
 export interface ApiResponse<T> {
-  success: boolean;
+  success?: boolean;
+  status?: string;
   data?: T;
   error?: string;
   message?: string;

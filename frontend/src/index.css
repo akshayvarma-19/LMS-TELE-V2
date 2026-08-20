@@ -1,58 +1,117 @@
 @import "tailwindcss";
 
 @layer base {
-  body {
-    background-color: #F5F7FA;
-    color: #0F172A;
+  *, ::before, ::after {
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  html, body {
+    background-color: #FFFFFF !important;
+    color: #111827 !important;
     font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
+
+  h1, h2, h3, h4, h5, h6 {
+    color: #111827;
+  }
+
+  p, span, label {
+    color: #111827;
+  }
 }
 
-/* Institutional Government Color Utility System */
-.bg-gov-navy {
-  background-color: #0B1F3A;
+/* TRACIA Brand Utility System */
+.bg-tracia-primary {
+  background-color: #034E4E !important;
 }
 
-.text-gov-navy {
-  color: #0B1F3A;
+.bg-tracia-dark {
+  background-color: #023838 !important;
 }
 
-.border-gov-slate {
-  border-color: #D9E0E8;
+.text-tracia-primary {
+  color: #034E4E !important;
 }
 
-/* Base button and card utilities */
-.gov-card {
-  background-color: #FFFFFF;
-  border: 1px solid #D9E0E8;
-  border-radius: 10px;
-  box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.04);
+.text-tracia-main {
+  color: #111827 !important;
 }
 
-.gov-button-primary {
-  background-color: #1D4ED8;
-  color: #FFFFFF;
+.text-tracia-muted {
+  color: #526262 !important;
+}
+
+.border-tracia {
+  border-color: #D9E3E3 !important;
+}
+
+/* Card and container utilities */
+.tracia-card {
+  background-color: #FFFFFF !important;
+  border: 1px solid #D9E3E3 !important;
+  border-radius: 8px;
+  box-shadow: none !important;
+}
+
+/* Button utilities */
+.tracia-btn-primary {
+  background-color: #034E4E !important;
+  color: #FFFFFF !important;
+  border: 1px solid #034E4E !important;
   border-radius: 6px;
   font-weight: 600;
   transition: background-color 0.15s ease-in-out;
 }
 
-.gov-button-primary:hover {
-  background-color: #1E40AF;
+.tracia-btn-primary:hover {
+  background-color: #023838 !important;
+  border-color: #023838 !important;
 }
 
-.gov-button-secondary {
-  background-color: #FFFFFF;
-  color: #334155;
-  border: 1px solid #CBD5E1;
+.tracia-btn-secondary {
+  background-color: #FFFFFF !important;
+  color: #034E4E !important;
+  border: 1px solid #D9E3E3 !important;
   border-radius: 6px;
   font-weight: 600;
   transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
 }
 
-.gov-button-secondary:hover {
-  background-color: #F8FAFC;
-  border-color: #94A3B8;
+.tracia-btn-secondary:hover {
+  background-color: #F8FAFA !important;
+  border-color: #034E4E !important;
+}
+
+/* Input Overrides */
+input, select, textarea {
+  background-color: #FFFFFF !important;
+  border: 1px solid #D9E3E3 !important;
+  color: #111827 !important;
+  border-radius: 6px;
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: #034E4E !important;
+  outline: none !important;
+}
+
+/* Legacy color overrides to guarantee #034E4E TRACIA palette */
+.bg-blue-600, .bg-blue-700, .bg-blue-800, .bg-indigo-600, .bg-indigo-700 {
+  background-color: #034E4E !important;
+  color: #FFFFFF !important;
+}
+
+.hover\:bg-blue-600:hover, .hover\:bg-blue-700:hover, .hover\:bg-indigo-700:hover {
+  background-color: #023838 !important;
+}
+
+.text-blue-600, .text-blue-700, .text-blue-800, .text-indigo-600 {
+  color: #034E4E !important;
+}
+
+.border-blue-600, .border-blue-700, .border-blue-500 {
+  border-color: #034E4E !important;
 }
