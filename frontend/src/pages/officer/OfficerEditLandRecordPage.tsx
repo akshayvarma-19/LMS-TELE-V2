@@ -1,13 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { ArrowLeft, Save, Loader2, Building, MapPin, User } from 'lucide-react';
 import { ErrorAlert } from '../../components/common/ErrorAlert';
+import { landService } from '../../services/landService';
 
 export const OfficerEditLandRecordPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [loadingDetails, setLoadingDetails] = useState(true);
   const [notice, setNotice] = useState<string | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     document_type: 'Sale Deed',
@@ -28,20 +31,79 @@ export const OfficerEditLandRecordPage: React.FC = () => {
     parent_document: '',
   });
 
+  useEffect(() => {
+    const fetchRecord = async () => {
+      if (!id) return;
+      setLoadingDetails(true);
+      setErrorMsg(null);
+      try {
+        const res = await landService.getLandRecord(id);
+        if ((res.success || res.status === 'success') && res.data) {
+          setFormData({
+            document_type: res.data.document_type || 'Sale Deed',
+            document_number: res.data.document_number || '',
+            registration_date: res.data.registration_date || '',
+            registration_office: res.data.registration_office || '',
+            district: res.data.district || '',
+            taluk: res.data.taluk || '',
+            village: res.data.village || '',
+            survey_number: res.data.survey_number || '',
+            patta_number: res.data.patta_number || '',
+            property_extent: res.data.property_extent || '',
+            land_type: res.data.land_type || 'Wet Land (Nanjai)',
+            owner_name: res.data.owner_name || '',
+            previous_owner: res.data.previous_owner || '',
+            sale_consideration: res.data.sale_consideration || '',
+            property_description: res.data.property_description || '',
+            parent_document: res.data.parent_document || '',
+          });
+        } else {
+          setErrorMsg(res.message || 'Failed to load land record details.');
+        }
+      } catch (err: any) {
+        setErrorMsg(err.message || 'Failed to connect to the backend server.');
+      } finally {
+        setLoadingDetails(false);
+      }
+    };
+    fetchRecord();
+  }, [id]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setNotice(null);
+    setErrorMsg(null);
 
-    setTimeout(() => {
+    try {
+      const res = await landService.updateLandRecord(id!, formData as any);
+      if (res.success || res.status === 'success') {
+        setNotice('Land record successfully updated in master registry!');
+        setTimeout(() => {
+          navigate(`/officer/land-records/${id}`);
+        }, 1500);
+      } else {
+        setErrorMsg(res.message || 'Failed to update land record.');
+      }
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Error occurred while saving the record.');
+    } finally {
       setLoading(false);
-      setNotice('Backend Connection Required. Master title updates and mutation audit logs will execute via the Express backend server.');
-    }, 800);
+    }
   };
+
+  if (loadingDetails) {
+    return (
+      <div className="flex flex-col items-center justify-center py-32 space-y-3">
+        <Loader2 className="w-8 h-8 animate-spin text-[#034E4E]" />
+        <p className="text-xs text-[#667085] font-semibold">Loading registry record details...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto">
@@ -62,6 +124,13 @@ export const OfficerEditLandRecordPage: React.FC = () => {
         title="Mutation Audit Status"
         message="Modifying land title fields triggers audit log entries and updates updated_at timestamps in Supabase."
       />
+
+      {errorMsg && (
+        <ErrorAlert
+          title="Operation Failed"
+          message={errorMsg}
+        />
+      )}
 
       {notice && (
         <div className="p-3 rounded bg-[#F4F8F7] border border-[#D9E2E1] text-xs text-[#034E4E]">

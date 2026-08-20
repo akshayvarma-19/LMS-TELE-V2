@@ -112,6 +112,46 @@ export const officerLandService = {
   },
 
   /**
+  /**
+   * Helper to map frontend payload fields to exact Supabase database columns.
+   */
+  mapFrontendToDbFields(data: any) {
+    const mapped: any = {
+      land_id: data.land_id,
+      owner_id: data.owner_id,
+      owner_name: data.owner_name,
+      survey_number: data.survey_number,
+      patta_number: data.patta_number,
+      village: data.village,
+      taluk: data.taluk,
+      district: data.district,
+      land_classification: data.land_type || data.land_classification || null,
+      document_number: data.document_number,
+      registration_date: data.registration_date || null,
+      registration_office: data.registration_office,
+      previous_owner_name: data.previous_owner || data.previous_owner_name || null,
+      parent_document_reference: data.parent_document || data.parent_document_reference || null,
+      sale_consideration: data.sale_consideration ? Number(data.sale_consideration) : null
+    };
+
+    if (data.property_extent !== undefined) {
+      const parsed = parseFloat(data.property_extent);
+      mapped.land_extent_acres = isNaN(parsed) ? null : parsed;
+    } else if (data.land_extent_acres !== undefined) {
+      mapped.land_extent_acres = Number(data.land_extent_acres);
+    }
+
+    // Clean undefined fields
+    Object.keys(mapped).forEach(key => {
+      if (mapped[key] === undefined) {
+        delete mapped[key];
+      }
+    });
+
+    return mapped;
+  },
+
+  /**
    * Create a new land record.
    */
   async createLandRecord(data: any) {
@@ -123,9 +163,11 @@ export const officerLandService = {
       }
     }
 
+    const dbPayload = this.mapFrontendToDbFields(data);
+
     const { data: insertedData, error } = await supabase
       .from('land_records')
-      .insert([data])
+      .insert([dbPayload])
       .select()
       .single();
 
@@ -148,8 +190,9 @@ export const officerLandService = {
       }
     }
 
+    const dbPayload = this.mapFrontendToDbFields(data);
     const updatePayload = {
-      ...data,
+      ...dbPayload,
       updated_at: new Date().toISOString()
     };
 

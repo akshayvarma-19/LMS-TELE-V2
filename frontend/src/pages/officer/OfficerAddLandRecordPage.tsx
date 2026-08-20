@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { ArrowLeft, Save, Loader2, Building, MapPin, User } from 'lucide-react';
 import { ErrorAlert } from '../../components/common/ErrorAlert';
+import { landService } from '../../services/landService';
 
 export const OfficerAddLandRecordPage: React.FC = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   // 16 Core Fields State
   const [formData, setFormData] = useState({
@@ -32,15 +34,27 @@ export const OfficerAddLandRecordPage: React.FC = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setNotice(null);
+    setErrorMsg(null);
 
-    setTimeout(() => {
+    try {
+      const res = await landService.createLandRecord(formData as any);
+      if (res.success || res.status === 'success') {
+        setNotice('Land record successfully created in master registry!');
+        setTimeout(() => {
+          navigate(`/officer/land-records/${res.data?.id}`);
+        }, 1500);
+      } else {
+        setErrorMsg(res.message || 'Failed to create land record.');
+      }
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Error occurred while saving the record.');
+    } finally {
       setLoading(false);
-      setNotice('Backend Connection Required. Land title records will be inserted directly into the database once the API service is connected.');
-    }, 800);
+    }
   };
 
   return (
@@ -63,6 +77,13 @@ export const OfficerAddLandRecordPage: React.FC = () => {
         title="Form Processing Notice"
         message="Submitting this form will execute server-side validation and write a new row to the database when backend is online."
       />
+
+      {errorMsg && (
+        <ErrorAlert
+          title="Submission Failed"
+          message={errorMsg}
+        />
+      )}
 
       {notice && (
         <div className="p-3 rounded bg-[#F4F8F7] border border-[#D9E2E1] text-xs text-[#034E4E]">
