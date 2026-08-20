@@ -19,25 +19,22 @@ export const citizenLandService = {
       .select('*')
       .eq('owner_id', userId);
 
-    if (error || !data || data.length === 0) {
-      const { data: allData } = await supabaseAdmin
-        .from('land_records')
-        .select('*')
-        .limit(10);
-      return allData || [];
+    if (error) {
+      throw new Error(`Failed to fetch land records: ${error.message}`);
     }
 
     return data || [];
   },
 
   /**
-   * Fetch details of any land record by ID (allowing general search detail inspection).
+   * Fetch a single land record belonging to the authenticated citizen.
    */
   async getLandById(userId: string, id: string) {
     const { data, error } = await supabaseAdmin
       .from('land_records')
       .select('*')
       .eq('id', id)
+      .eq('owner_id', userId)
       .maybeSingle();
 
     if (error) {
