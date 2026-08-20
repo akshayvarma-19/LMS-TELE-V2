@@ -33,21 +33,21 @@ export const CitizenLayout: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F8FAFA] text-[#101828]">
+    <div className="min-h-screen flex flex-col bg-[#F7FAF9] text-[#172121]">
       {/* Global Header */}
       <Header userRole="citizen" />
 
       <div className="flex-1 flex overflow-hidden">
-        {/* Desktop Sidebar (#034E4E) */}
-        <aside className="hidden md:flex flex-col w-64 bg-[#034E4E] border-r border-[#023B3B] text-white shrink-0 justify-between">
+        {/* Desktop Sidebar (White bg with #DDE5E3 border) */}
+        <aside className="hidden md:flex flex-col w-64 bg-white border-r border-[#DDE5E3] text-[#172121] shrink-0 justify-between">
           <div>
-            <div className="px-5 py-4 border-b border-[#023B3B]">
-              <span className="text-[10px] font-extrabold uppercase text-white/70 tracking-widest">
+            <div className="px-5 py-4 border-b border-[#DDE5E3] flex items-center space-x-2">
+              <span className="text-[10px] font-extrabold uppercase text-[#667085] tracking-widest">
                 TRACIA NAVIGATION
               </span>
             </div>
 
-            <nav className="px-3 py-4 space-y-1.5 overflow-y-auto">
+            <nav className="px-3 py-4 space-y-1 overflow-y-auto">
               {navItems.map((item) => {
                 const Icon = item.icon;
                 const isActive =
@@ -59,15 +59,15 @@ export const CitizenLayout: React.FC = () => {
                     to={item.path}
                     className={`relative flex items-center justify-between px-3.5 py-2.5 text-xs font-semibold rounded-lg transition-all ${
                       isActive
-                        ? 'bg-white text-[#034E4E] shadow-xs'
-                        : 'text-white/85 hover:bg-[#023B3B] hover:text-white'
+                        ? 'bg-[#EAF4F3] text-[#034E4E]'
+                        : 'text-[#667085] hover:bg-[#F4F8F7] hover:text-[#172121]'
                     }`}
                   >
                     <div className="flex items-center space-x-3">
                       {isActive && (
                         <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-[#034E4E] rounded-r-md" />
                       )}
-                      <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-[#034E4E]' : 'text-white/80'}`} />
+                      <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-[#034E4E]' : 'text-[#667085]'}`} />
                       <span>{item.label}</span>
                     </div>
                   </NavLink>
@@ -77,12 +77,12 @@ export const CitizenLayout: React.FC = () => {
           </div>
 
           {/* Bottom Transparency Emblem Box */}
-          <div className="p-4 border-t border-[#023B3B]">
-            <div className="p-3 bg-[#023B3B]/70 rounded-lg border border-white/10 flex items-center space-x-3">
-              <ShieldCheck className="w-5 h-5 text-white shrink-0" />
+          <div className="p-4 border-t border-[#DDE5E3]">
+            <div className="p-3 bg-[#F4F8F7] rounded-lg border border-[#DDE5E3] flex items-center space-x-3">
+              <ShieldCheck className="w-5 h-5 text-[#034E4E] shrink-0" />
               <div>
-                <p className="text-[11px] font-bold text-white tracking-tight">Empowering Transparency</p>
-                <p className="text-[10px] text-white/70">Securing Your Land Rights</p>
+                <p className="text-[11px] font-bold text-[#034E4E] tracking-tight">Empowering Transparency</p>
+                <p className="text-[10px] text-[#667085]">Securing Your Land Rights</p>
               </div>
             </div>
           </div>
@@ -110,18 +110,18 @@ export const CitizenLayout: React.FC = () => {
 
         {/* Mobile Drawer */}
         <div
-          className={`fixed inset-y-0 left-0 z-50 w-64 bg-[#034E4E] text-white transform transition-transform duration-200 ease-in-out md:hidden flex flex-col justify-between ${
+          className={`fixed inset-y-0 left-0 z-50 w-64 bg-white text-[#172121] border-r border-[#DDE5E3] transform transition-transform duration-200 ease-in-out md:hidden flex flex-col justify-between ${
             mobileOpen ? 'translate-x-0' : '-translate-x-full'
           }`}
         >
           <div>
-            <div className="p-4 border-b border-[#023B3B] flex items-center justify-between">
-              <span className="text-xs font-bold text-white uppercase tracking-wider">TRACIA Menu</span>
-              <button onClick={() => setMobileOpen(false)} className="p-1 text-white/80">
+            <div className="p-4 border-b border-[#DDE5E3] flex items-center justify-between">
+              <span className="text-xs font-bold text-[#034E4E] uppercase tracking-wider">TRACIA Menu</span>
+              <button onClick={() => setMobileOpen(false)} className="p-1 text-[#667085]">
                 <X className="w-5 h-5" />
               </button>
             </div>
-            <nav className="px-3 py-4 space-y-1.5 overflow-y-auto">
+            <nav className="px-3 py-4 space-y-1 overflow-y-auto">
               {navItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = location.pathname === item.path;
@@ -132,8 +132,8 @@ export const CitizenLayout: React.FC = () => {
                     onClick={() => setMobileOpen(false)}
                     className={`flex items-center justify-between px-3.5 py-2.5 text-xs font-semibold rounded-lg transition-all ${
                       isActive
-                        ? 'bg-white text-[#034E4E]'
-                        : 'text-white/85 hover:bg-[#023B3B]'
+                        ? 'bg-[#EAF4F3] text-[#034E4E]'
+                        : 'text-[#667085] hover:bg-[#F4F8F7]'
                     }`}
                   >
                     <div className="flex items-center space-x-3">
@@ -148,13 +148,13 @@ export const CitizenLayout: React.FC = () => {
         </div>
 
         {/* Main Content & Footer */}
-        <div className="flex-1 flex flex-col overflow-y-auto min-w-0 bg-[#F8FAFA]">
+        <div className="flex-1 flex flex-col overflow-y-auto min-w-0 bg-[#F7FAF9]">
           <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
             <Outlet />
           </main>
 
           {/* Official Footer */}
-          <footer className="border-t border-[#D9E2E1] bg-white px-6 py-4 text-center sm:text-left text-[11px] text-[#667085]">
+          <footer className="border-t border-[#DDE5E3] bg-white px-6 py-4 text-center sm:text-left text-[11px] text-[#667085]">
             <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
               <span>© 2025 TRACIA. All rights reserved.</span>
               <span className="hidden sm:inline">•</span>

@@ -19,7 +19,7 @@ export const Header: React.FC<HeaderProps> = ({ userRole = 'citizen', onLogout }
   };
 
   return (
-    <header className="bg-white text-[#101828] border-b border-[#D9E2E1] sticky top-0 z-30 shadow-[0_1px_3px_rgba(16,24,40,0.05)]">
+    <header className="bg-white text-[#172121] border-b border-[#DDE5E3] sticky top-0 z-30 shadow-[0_1px_3px_rgba(23,33,33,0.04)]">
       <div className="w-full px-4 sm:px-6">
         <div className="flex items-center justify-between h-14">
           {/* Left Branding */}
@@ -29,7 +29,7 @@ export const Header: React.FC<HeaderProps> = ({ userRole = 'citizen', onLogout }
             </div>
             <div className="flex items-center space-x-2.5">
               <span className="text-lg font-extrabold tracking-tight text-[#034E4E]">TRACIA</span>
-              <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-[#F4F8F7] text-[#034E4E] border border-[#D9E2E1] tracking-wide">
+              <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-[#F4F8F7] text-[#034E4E] border border-[#DDE5E3] tracking-wide">
                 PS-09
               </span>
               <span className="hidden md:inline text-[#667085]">•</span>
@@ -42,21 +42,17 @@ export const Header: React.FC<HeaderProps> = ({ userRole = 'citizen', onLogout }
           {/* Right Controls */}
           <div className="flex items-center space-x-2 sm:space-x-3">
             {/* Notification Bell */}
-            <Link
-              to="/citizen/notifications"
-              className="relative p-2 rounded-lg text-[#667085] hover:text-[#034E4E] hover:bg-[#F4F8F7] transition-colors"
-              title="Notifications"
-            >
+            <div className="relative p-2 rounded-lg text-[#667085] hover:text-[#034E4E] hover:bg-[#F4F8F7] transition-colors cursor-pointer" title="Notifications">
               <Bell className="w-4.5 h-4.5" />
               <span className="absolute top-1.5 right-1.5 w-3.5 h-3.5 bg-[#034E4E] text-white text-[9px] font-extrabold rounded-full flex items-center justify-center border border-white">
                 3
               </span>
-            </Link>
+            </div>
 
             {/* Portal Switcher Button */}
             <button
               onClick={handlePortalSwitch}
-              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-[#F4F8F7] hover:bg-[#034E4E] hover:text-white text-[#034E4E] text-xs font-bold border border-[#D9E2E1] transition-all group shadow-xs"
+              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-[#F4F8F7] hover:bg-[#034E4E] hover:text-white text-[#034E4E] text-xs font-bold border border-[#DDE5E3] transition-all group shadow-xs"
             >
               <ShieldCheck className="w-3.5 h-3.5 text-[#034E4E] group-hover:text-white transition-colors" />
               <span className="hidden sm:inline">
@@ -78,7 +74,7 @@ export const Header: React.FC<HeaderProps> = ({ userRole = 'citizen', onLogout }
             <Link
               to="/login"
               onClick={onLogout}
-              className="flex items-center space-x-1.5 px-2.5 py-1.5 text-xs font-semibold rounded-lg bg-white hover:bg-[#F4F8F7] text-[#667085] hover:text-[#034E4E] border border-[#D9E2E1] transition-colors"
+              className="flex items-center space-x-1.5 px-2.5 py-1.5 text-xs font-semibold rounded-lg bg-white hover:bg-[#F4F8F7] text-[#667085] hover:text-[#034E4E] border border-[#DDE5E3] transition-colors"
             >
               <LogOut className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Logout</span>

@@ -8,10 +8,10 @@
   --tracia-light: #EAF4F3;
   --tracia-very-light: #F4F8F7;
   --tracia-white: #FFFFFF;
-  --tracia-text-primary: #101828;
+  --tracia-text-primary: #172121;
   --tracia-text-secondary: #667085;
-  --tracia-border: #D9E2E1;
-  --tracia-bg: #F8FAFA;
+  --tracia-border: #DDE5E3;
+  --tracia-bg: #F7FAF9;
 }
 
 @layer base {
@@ -48,14 +48,6 @@
   background-color: #023B3B !important;
 }
 
-.bg-tracia-deep {
-  background-color: #012F2F !important;
-}
-
-.bg-tracia-medium {
-  background-color: #0B6868 !important;
-}
-
 .bg-tracia-light {
   background-color: #EAF4F3 !important;
 }
@@ -65,7 +57,7 @@
 }
 
 .bg-tracia-bg {
-  background-color: #F8FAFA !important;
+  background-color: #F7FAF9 !important;
 }
 
 .text-tracia-primary {
@@ -73,7 +65,7 @@
 }
 
 .text-tracia-main {
-  color: #101828 !important;
+  color: #172121 !important;
 }
 
 .text-tracia-secondary {
@@ -81,29 +73,29 @@
 }
 
 .border-tracia {
-  border-color: #D9E2E1 !important;
+  border-color: #DDE5E3 !important;
 }
 
-/* Refined Enterprise Card Utility */
+/* Refined Government Enterprise Card Utility */
 .tracia-card {
   background-color: #FFFFFF !important;
-  border: 1px solid #D9E2E1 !important;
-  border-radius: 14px !important;
-  box-shadow: 0 2px 8px rgba(16, 24, 40, 0.04) !important;
+  border: 1px solid #DDE5E3 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 2px 6px rgba(23, 33, 33, 0.03) !important;
   transition: box-shadow 0.2s ease-in-out, border-color 0.2s ease-in-out;
 }
 
 .tracia-card-interactive {
   background-color: #FFFFFF !important;
-  border: 1px solid #D9E2E1 !important;
-  border-radius: 14px !important;
-  box-shadow: 0 2px 8px rgba(16, 24, 40, 0.04) !important;
+  border: 1px solid #DDE5E3 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 2px 6px rgba(23, 33, 33, 0.03) !important;
   transition: all 0.2s ease-in-out;
 }
 
 .tracia-card-interactive:hover {
   border-color: #034E4E !important;
-  box-shadow: 0 4px 12px rgba(16, 24, 40, 0.07) !important;
+  box-shadow: 0 4px 12px rgba(23, 33, 33, 0.06) !important;
 }
 
 /* Button Utilities (8–10px Radius) */
@@ -125,7 +117,7 @@
 .tracia-btn-secondary {
   background-color: #FFFFFF !important;
   color: #034E4E !important;
-  border: 1px solid #D9E2E1 !important;
+  border: 1px solid #DDE5E3 !important;
   border-radius: 9px !important;
   font-weight: 700 !important;
   padding: 0.5rem 1.125rem !important;
@@ -141,8 +133,8 @@
 /* Form Controls */
 input, select, textarea {
   background-color: #FFFFFF !important;
-  border: 1px solid #D9E2E1 !important;
-  color: #101828 !important;
+  border: 1px solid #DDE5E3 !important;
+  color: #172121 !important;
   border-radius: 8px !important;
 }
 
@@ -160,7 +152,7 @@ input:focus, select:focus, textarea:focus {
   text-transform: uppercase;
   font-size: 0.75rem;
   letter-spacing: 0.05em;
-  border-bottom: 1px solid #D9E2E1 !important;
+  border-bottom: 1px solid #DDE5E3 !important;
 }
 
 .tracia-table-row {
@@ -169,10 +161,10 @@ input:focus, select:focus, textarea:focus {
 }
 
 .tracia-table-row:hover {
-  background-color: #F8FAFA !important;
+  background-color: #F7FAF9 !important;
 }
 
-/* Global Color overrides to guarantee #034E4E TRACIA palette */
+/* Global Color Overrides */
 .bg-blue-600, .bg-blue-700, .bg-blue-800, .bg-indigo-600, .bg-indigo-700 {
   background-color: #034E4E !important;
   color: #FFFFFF !important;

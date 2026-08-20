@@ -31,7 +31,7 @@ export const OfficerApplicationsPage: React.FC = () => {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 text-xs sm:text-sm bg-white border border-[#D9E2E1] rounded-md focus:border-[#034E4E] focus:outline-none"
+            className="w-full pl-9 pr-4 py-2 text-xs sm:text-sm bg-white border border-[#DDE5E3] rounded-md focus:border-[#034E4E] focus:outline-none"
           >
             <option value="">All Statuses</option>
             <option value="submitted">Submitted</option>
@@ -46,7 +46,7 @@ export const OfficerApplicationsPage: React.FC = () => {
           <select
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value)}
-            className="w-full px-3 py-2 text-xs sm:text-sm bg-white border border-[#D9E2E1] rounded-md focus:border-[#034E4E] focus:outline-none"
+            className="w-full px-3 py-2 text-xs sm:text-sm bg-white border border-[#DDE5E3] rounded-md focus:border-[#034E4E] focus:outline-none"
           >
             <option value="">All Application Types</option>
             <option value="sale_transfer">Land Sale / Transfer</option>

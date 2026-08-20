@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import {
   FileText,
@@ -7,48 +7,14 @@ import {
   AlertOctagon,
   ChevronRight,
   Database,
-  Loader2,
+  Map,
   ArrowRight,
-  Bot,
-  Map
+  ClipboardList,
 } from 'lucide-react';
 import { ErrorAlert } from '../../components/common/ErrorAlert';
 import { EmptyState } from '../../components/common/EmptyState';
-import { landService } from '../../services/landService';
-import { grievanceService } from '../../services/grievanceService';
-import type { LandRecord, Grievance } from '../../types';
 
 export const CitizenDashboardPage: React.FC = () => {
-  const [lands, setLands] = useState<LandRecord[]>([]);
-  const [grievances, setGrievances] = useState<Grievance[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchDashboardData = async () => {
-      setLoading(true);
-      setErrorMsg(null);
-      try {
-        const [landsRes, grievancesRes] = await Promise.all([
-          landService.getMyLandRecords(),
-          grievanceService.getMyGrievances()
-        ]);
-
-        if ((landsRes.status === 'success' || landsRes.success) && landsRes.data) {
-          setLands(landsRes.data);
-        }
-        if ((grievancesRes.status === 'success' || grievancesRes.success) && grievancesRes.data) {
-          setGrievances(grievancesRes.data);
-        }
-      } catch (err: any) {
-        setErrorMsg(err.message || 'Failed to connect to backend services.');
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchDashboardData();
-  }, []);
-
   return (
     <div className="space-y-6">
       {/* Citizen Hero Banner with Subtle Architectural Line Graphic */}
@@ -59,7 +25,7 @@ export const CitizenDashboardPage: React.FC = () => {
             TRACIA Citizen
           </h1>
           <p className="text-xs sm:text-sm text-[#667085] leading-relaxed">
-            Manage your land records, verify documents and track grievances.
+            Manage your land records, verify documents, submit applications, and track grievances.
           </p>
         </div>
 
@@ -68,7 +34,7 @@ export const CitizenDashboardPage: React.FC = () => {
           <svg viewBox="0 0 400 100" className="w-full h-full" fill="none" stroke="#034E4E" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
             {/* Background Horizon Line */}
             <line x1="20" y1="85" x2="380" y2="85" stroke="#034E4E" strokeWidth="2" />
-            <path d="M 40 30 Q 50 20 60 30 Q 70 20 80 30 L 350 30 Q 360 20 370 30 Q 380 20 390 30" stroke="#D9E2E1" strokeDasharray="3 3" />
+            <path d="M 40 30 Q 50 20 60 30 Q 70 20 80 30 L 350 30 Q 360 20 370 30 Q 380 20 390 30" stroke="#DDE5E3" strokeDasharray="3 3" />
 
             {/* Residential House */}
             <path d="M 110 85 L 110 55 L 140 55 L 140 85 Z" stroke="#0B6868" />
@@ -102,16 +68,15 @@ export const CitizenDashboardPage: React.FC = () => {
         </div>
       </div>
 
-      {errorMsg && (
-        <ErrorAlert
-          title="Service Connection Error"
-          message={errorMsg}
-        />
-      )}
+      {/* System Status Callout Banner */}
+      <ErrorAlert
+        title="Data services are currently unavailable."
+        message="Your records will appear here when the service is connected."
+      />
 
       {/* QUICK ACTIONS Grid (Unified #034E4E Icon Containers System) */}
       <div>
-        <h2 className="text-xs font-extrabold text-[#101828] uppercase tracking-wider mb-3">
+        <h2 className="text-xs font-extrabold text-[#172121] uppercase tracking-wider mb-3">
           QUICK ACTIONS
         </h2>
 
@@ -126,7 +91,7 @@ export const CitizenDashboardPage: React.FC = () => {
                 <FileText className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="font-bold text-[#101828] text-xs sm:text-sm group-hover:text-[#034E4E] transition-colors">
+                <h3 className="font-bold text-[#172121] text-xs sm:text-sm group-hover:text-[#034E4E] transition-colors">
                   View My Land Records
                 </h3>
                 <p className="text-[11px] text-[#667085] mt-0.5 leading-snug">
@@ -147,7 +112,7 @@ export const CitizenDashboardPage: React.FC = () => {
                 <Search className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="font-bold text-[#101828] text-xs sm:text-sm group-hover:text-[#034E4E] transition-colors">
+                <h3 className="font-bold text-[#172121] text-xs sm:text-sm group-hover:text-[#034E4E] transition-colors">
                   Search Land Records
                 </h3>
                 <p className="text-[11px] text-[#667085] mt-0.5 leading-snug">
@@ -158,21 +123,21 @@ export const CitizenDashboardPage: React.FC = () => {
             <ArrowRight className="w-4 h-4 text-[#667085] group-hover:text-[#034E4E] group-hover:translate-x-1 transition-all shrink-0 ml-2" />
           </Link>
 
-          {/* Action 3: Upload Document */}
+          {/* Action 3: Applications */}
           <Link
-            to="/citizen/ocr"
+            to="/citizen/applications"
             className="tracia-card-interactive p-4 flex items-center justify-between group"
           >
             <div className="flex items-start space-x-3.5">
               <div className="w-10 h-10 rounded-lg bg-[#034E4E] text-white flex items-center justify-center shrink-0 shadow-xs">
-                <Upload className="w-5 h-5" />
+                <ClipboardList className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="font-bold text-[#101828] text-xs sm:text-sm group-hover:text-[#034E4E] transition-colors">
-                  Upload Document
+                <h3 className="font-bold text-[#172121] text-xs sm:text-sm group-hover:text-[#034E4E] transition-colors">
+                  Land Applications
                 </h3>
                 <p className="text-[11px] text-[#667085] mt-0.5 leading-snug">
-                  Verify physical deed document accuracy using OCR.
+                  Submit land transfer, construction, or classification change petitions.
                 </p>
               </div>
             </div>
@@ -189,7 +154,7 @@ export const CitizenDashboardPage: React.FC = () => {
                 <AlertOctagon className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="font-bold text-[#101828] text-xs sm:text-sm group-hover:text-[#034E4E] transition-colors">
+                <h3 className="font-bold text-[#172121] text-xs sm:text-sm group-hover:text-[#034E4E] transition-colors">
                   Track Grievance
                 </h3>
                 <p className="text-[11px] text-[#667085] mt-0.5 leading-snug">
@@ -200,7 +165,28 @@ export const CitizenDashboardPage: React.FC = () => {
             <ArrowRight className="w-4 h-4 text-[#667085] group-hover:text-[#034E4E] group-hover:translate-x-1 transition-all shrink-0 ml-2" />
           </Link>
 
-          {/* Action 5: 3D Land Map */}
+          {/* Action 5: Upload Document */}
+          <Link
+            to="/citizen/ocr"
+            className="tracia-card-interactive p-4 flex items-center justify-between group"
+          >
+            <div className="flex items-start space-x-3.5">
+              <div className="w-10 h-10 rounded-lg bg-[#034E4E] text-white flex items-center justify-center shrink-0 shadow-xs">
+                <Upload className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="font-bold text-[#172121] text-xs sm:text-sm group-hover:text-[#034E4E] transition-colors">
+                  Upload Document
+                </h3>
+                <p className="text-[11px] text-[#667085] mt-0.5 leading-snug">
+                  Verify physical deed document accuracy using OCR.
+                </p>
+              </div>
+            </div>
+            <ArrowRight className="w-4 h-4 text-[#667085] group-hover:text-[#034E4E] group-hover:translate-x-1 transition-all shrink-0 ml-2" />
+          </Link>
+
+          {/* Action 6: 3D Land Map */}
           <Link
             to="/citizen/map"
             className="tracia-card-interactive p-4 flex items-center justify-between group"
@@ -210,32 +196,11 @@ export const CitizenDashboardPage: React.FC = () => {
                 <Map className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="font-bold text-[#101828] text-xs sm:text-sm group-hover:text-[#034E4E] transition-colors">
+                <h3 className="font-bold text-[#172121] text-xs sm:text-sm group-hover:text-[#034E4E] transition-colors">
                   3D Land Map
                 </h3>
                 <p className="text-[11px] text-[#667085] mt-0.5 leading-snug">
                   Explore land parcels and boundaries in interactive 3D view.
-                </p>
-              </div>
-            </div>
-            <ArrowRight className="w-4 h-4 text-[#667085] group-hover:text-[#034E4E] group-hover:translate-x-1 transition-all shrink-0 ml-2" />
-          </Link>
-
-          {/* Action 6: AI Assistant */}
-          <Link
-            to="/citizen/assistant"
-            className="tracia-card-interactive p-4 flex items-center justify-between group"
-          >
-            <div className="flex items-start space-x-3.5">
-              <div className="w-10 h-10 rounded-lg bg-[#034E4E] text-white flex items-center justify-center shrink-0 shadow-xs">
-                <Bot className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="font-bold text-[#101828] text-xs sm:text-sm group-hover:text-[#034E4E] transition-colors">
-                  AI Assistant
-                </h3>
-                <p className="text-[11px] text-[#667085] mt-0.5 leading-snug">
-                  Get help and information about land records and services.
                 </p>
               </div>
             </div>
@@ -247,102 +212,49 @@ export const CitizenDashboardPage: React.FC = () => {
       {/* Main Two-Column Layout (My Land Records & Recent Grievances) */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* LEFT: My Land Records */}
-        <div className="bg-white rounded-lg border border-[#E5E5E5] p-5 flex flex-col">
-          <div className="flex items-center justify-between pb-3 mb-3 border-b border-[#E5E5E5]">
-            <h2 className="text-sm font-bold text-[#1F1F1F] flex items-center space-x-2">
-              <FileText className="w-4.5 h-4.5 text-[rgb(3,78,78)]" />
+        <div className="tracia-card p-5 flex flex-col justify-between">
+          <div className="flex items-center justify-between pb-3 mb-3 border-b border-[#DDE5E3]">
+            <h2 className="text-xs sm:text-sm font-extrabold text-[#172121] flex items-center space-x-2">
+              <FileText className="w-4.5 h-4.5 text-[#034E4E]" />
               <span>My Land Records</span>
             </h2>
             <Link
               to="/citizen/land-records"
-              className="text-xs font-semibold text-[#034E4E] hover:underline flex items-center px-2.5 py-1 rounded-lg bg-[#F4F8F7] border border-[#D9E2E1] transition-colors"
+              className="text-xs font-semibold text-[#034E4E] hover:underline flex items-center px-2.5 py-1 rounded-lg bg-[#F4F8F7] border border-[#DDE5E3] transition-colors"
             >
               <span>View All</span>
               <ChevronRight className="w-3.5 h-3.5 ml-0.5" />
             </Link>
           </div>
 
-          {loading ? (
-            <div className="flex justify-center items-center py-8 flex-1">
-              <Loader2 className="w-6 h-6 animate-spin text-[rgb(3,78,78)]" />
-            </div>
-          ) : lands.length === 0 ? (
-            <EmptyState
-              title="No land records available."
-              description="Your registered land properties will appear here automatically."
-              icon={<Database className="w-5 h-5 text-[rgb(30,139,139)]" />}
-            />
-          ) : (
-            <div className="space-y-3">
-              {lands.slice(0, 3).map((land) => (
-                <Link
-                  key={land.id}
-                  to={`/citizen/land-records/${land.id}`}
-                  className="block p-3 rounded-lg border border-[#E5E5E5] hover:border-[rgb(3,78,78)] transition-all text-xs"
-                >
-                  <div className="flex justify-between items-center">
-                    <span className="font-bold text-slate-800">Survey No: {land.survey_number}</span>
-                    <span className="font-mono text-slate-500">{land.village}</span>
-                  </div>
-                  <div className="mt-1 flex justify-between text-slate-500 text-[10px]">
-                    <span>Patta: {land.patta_number || 'N/A'}</span>
-                    <span>Extent: {land.property_extent || 'N/A'}</span>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          )}
+          <EmptyState
+            title="No land records available."
+            description="Your registered land properties will appear here automatically once the service is connected."
+            icon={<Database className="w-5 h-5 text-[#034E4E]" />}
+          />
         </div>
 
         {/* RIGHT: Recent Grievances */}
-        <div className="bg-white rounded-lg border border-[#E5E5E5] p-5 flex flex-col">
-          <div className="flex items-center justify-between pb-3 mb-3 border-b border-[#E5E5E5]">
-            <h2 className="text-sm font-bold text-[#1F1F1F] flex items-center space-x-2">
-              <AlertOctagon className="w-4.5 h-4.5 text-[rgb(3,78,78)]" />
+        <div className="tracia-card p-5 flex flex-col justify-between">
+          <div className="flex items-center justify-between pb-3 mb-3 border-b border-[#DDE5E3]">
+            <h2 className="text-xs sm:text-sm font-extrabold text-[#172121] flex items-center space-x-2">
+              <AlertOctagon className="w-4.5 h-4.5 text-[#034E4E]" />
               <span>Recent Grievances</span>
             </h2>
             <Link
               to="/citizen/grievances"
-              className="text-xs font-semibold text-[#034E4E] hover:underline flex items-center px-2.5 py-1 rounded-lg bg-[#F4F8F7] border border-[#D9E2E1] transition-colors"
+              className="text-xs font-semibold text-[#034E4E] hover:underline flex items-center px-2.5 py-1 rounded-lg bg-[#F4F8F7] border border-[#DDE5E3] transition-colors"
             >
               <span>View All</span>
               <ChevronRight className="w-3.5 h-3.5 ml-0.5" />
             </Link>
           </div>
 
-          {loading ? (
-            <div className="flex justify-center items-center py-8 flex-1">
-              <Loader2 className="w-6 h-6 animate-spin text-[rgb(3,78,78)]" />
-            </div>
-          ) : grievances.length === 0 ? (
-            <EmptyState
-              title="No grievances submitted yet."
-              description="Any grievances submitted by you will be listed here with live resolution status tracking."
-              icon={<AlertOctagon className="w-5 h-5 text-[rgb(30,139,139)]" />}
-            />
-          ) : (
-            <div className="space-y-3">
-              {grievances.slice(0, 3).map((g) => (
-                <Link
-                  key={g.id}
-                  to={`/citizen/grievances/${g.id}`}
-                  className="block p-3 rounded-lg border border-[#E5E5E5] hover:border-[rgb(3,78,78)] transition-all text-xs"
-                >
-                  <div className="flex justify-between items-center">
-                    <span className="font-bold text-slate-800 capitalize">{g.category.replace(/_/g, ' ')}</span>
-                    <span className={`px-2 py-0.5 text-[10px] font-semibold rounded-full uppercase ${
-                      g.status === 'resolved' 
-                        ? 'bg-emerald-100 text-emerald-800' 
-                        : g.status === 'under_review' 
-                        ? 'bg-blue-100 text-blue-800' 
-                        : 'bg-amber-100 text-amber-800'
-                    }`}>{g.status.replace(/_/g, ' ')}</span>
-                  </div>
-                  <p className="mt-1 text-[#526262] text-[10px] line-clamp-1">{g.description}</p>
-                </Link>
-              ))}
-            </div>
-          )}
+          <EmptyState
+            title="No grievances submitted yet."
+            description="Any grievances submitted by you will be listed here with live resolution status tracking."
+            icon={<AlertOctagon className="w-5 h-5 text-[#034E4E]" />}
+          />
         </div>
       </div>
     </div>

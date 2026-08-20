@@ -148,7 +148,7 @@ export const OfficerGrievanceDetailPage: React.FC = () => {
                 : grievance.status === 'under_review' 
                 ? 'warning' 
                 : grievance.status === 'rejected'
-                ? 'danger'
+                ? 'error'
                 : 'neutral'
             }>
               {grievance.status.replace(/_/g, ' ')}
