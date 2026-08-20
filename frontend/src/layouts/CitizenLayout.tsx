@@ -9,7 +9,6 @@ import {
   Upload,
   Map,
   Bot,
-  Bell,
   User,
   Menu,
   X,
@@ -30,7 +29,6 @@ export const CitizenLayout: React.FC = () => {
     { label: 'Upload Document', path: '/citizen/ocr', icon: Upload },
     { label: '3D Land Map', path: '/citizen/map', icon: Map },
     { label: 'AI Assistant', path: '/citizen/assistant', icon: Bot },
-    { label: 'Notifications', path: '/citizen/notifications', icon: Bell, badge: '3' },
     { label: 'Profile & Settings', path: '/citizen/profile', icon: User },
   ];
 
@@ -72,11 +70,6 @@ export const CitizenLayout: React.FC = () => {
                       <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-[#034E4E]' : 'text-white/80'}`} />
                       <span>{item.label}</span>
                     </div>
-                    {item.badge && (
-                      <span className="px-1.5 py-0.5 text-[10px] font-extrabold bg-[#DC2626] text-white rounded-full">
-                        {item.badge}
-                      </span>
-                    )}
                   </NavLink>
                 );
               })}
@@ -147,11 +140,6 @@ export const CitizenLayout: React.FC = () => {
                       <Icon className="w-4 h-4" />
                       <span>{item.label}</span>
                     </div>
-                    {item.badge && (
-                      <span className="px-1.5 py-0.5 text-[10px] font-extrabold bg-[#DC2626] text-white rounded-full">
-                        {item.badge}
-                      </span>
-                    )}
                   </NavLink>
                 );
               })}
