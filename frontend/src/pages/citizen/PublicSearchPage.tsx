@@ -160,22 +160,26 @@ export const PublicSearchPage: React.FC = () => {
   }, []);
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
+    <div className="space-y-6 max-w-6xl mx-auto">
+      {/* Page Header */}
       <div>
-        <h1 className="text-2xl font-bold text-slate-900">Public Land Search</h1>
-        <p className="text-sm text-slate-500 mt-1">
-          Search land record availability by Survey Number, Village, Taluk, and District.
+        <h1 className="text-xl sm:text-2xl font-extrabold text-[#034E4E] tracking-tight">
+          Public Land Search
+        </h1>
+        <p className="text-xs sm:text-sm text-[#667085] mt-1 leading-relaxed">
+          Search publicly available land-record indicators using survey number, village, taluk and district.
         </p>
       </div>
 
-      {/* Security Privacy Notice */}
-      <div className="p-4 rounded-xl bg-blue-50 border border-blue-200 text-blue-950 text-xs flex items-start space-x-3">
-        <ShieldCheck className="w-5 h-5 text-blue-700 shrink-0 mt-0.5" />
+      {/* Privacy Disclosure Notice */}
+      <div className="p-4 rounded-xl bg-[#F4F8F7] border border-[#D9E2E1] text-[#101828] text-xs flex items-start space-x-3.5 shadow-[0_1px_3px_rgba(16,24,40,0.03)]">
+        <div className="w-8 h-8 rounded-lg bg-[#EAF4F3] border border-[#0B6868]/20 flex items-center justify-center text-[#034E4E] shrink-0 mt-0.5">
+          <ShieldCheck className="w-4.5 h-4.5" />
+        </div>
         <div>
-          <h4 className="font-bold text-blue-900">Public Privacy Disclosure</h4>
-          <p className="mt-0.5 leading-relaxed text-blue-800">
-            Public search results strictly display non-sensitive title indicators: <strong>Survey Number, Property Extent, Village, Taluk, and District</strong>. Personal ownership details, patta numbers, and sale considerations are kept private and accessible only to verified title owners.
+          <h4 className="font-bold text-[#034E4E] text-xs">Public Privacy Disclosure</h4>
+          <p className="mt-1 leading-relaxed text-[#667085]">
+            Public search results strictly display non-sensitive title indicators: <strong>Survey Number</strong>, <strong>Property Extent</strong>, <strong>Village</strong>, <strong>Taluk</strong>, and <strong>District</strong>. Personal ownership details, patta numbers, and sale considerations are kept private and accessible only to verified title owners.
           </p>
         </div>
       </div>
@@ -329,9 +333,12 @@ export const PublicSearchPage: React.FC = () => {
         </form>
       </div>
 
-      {/* Results Section */}
-      <div>
-        <h2 className="text-base font-bold text-slate-900 mb-3">Public Search Results</h2>
+      {/* Search Results Section */}
+      <div className="space-y-3">
+        <div>
+          <h2 className="text-sm font-extrabold text-[#101828]">Search Results</h2>
+          <p className="text-xs text-[#667085] mt-0.5">Publicly available land indicators matching your search.</p>
+        </div>
 
         {errorMsg && (
           <div className="p-4 mb-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center space-x-2">
@@ -344,7 +351,7 @@ export const PublicSearchPage: React.FC = () => {
           <EmptyState
             title="Enter survey details to search"
             description="Enter a survey number and village name above to query public land title registry records."
-            icon={<Search className="w-6 h-6 text-slate-400" />}
+            icon={<Search className="w-5 h-5 text-[#034E4E]" />}
           />
         ) : loading ? (
           <div className="bg-white p-12 text-center rounded-2xl border border-slate-200 flex flex-col justify-center items-center">

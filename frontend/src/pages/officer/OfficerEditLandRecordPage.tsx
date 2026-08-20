@@ -37,7 +37,6 @@ export const OfficerEditLandRecordPage: React.FC = () => {
     setLoading(true);
     setNotice(null);
 
-    // Call updateLandRecord API placeholder
     setTimeout(() => {
       setLoading(false);
       setNotice('Backend Connection Required. Master title updates and mutation audit logs will execute via the Express backend server.');
@@ -49,13 +48,13 @@ export const OfficerEditLandRecordPage: React.FC = () => {
       <div className="flex items-center space-x-3">
         <Link
           to={`/officer/land-records/${id || 'demo'}`}
-          className="p-2 rounded-lg bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors"
+          className="p-2 rounded-lg bg-white border border-[#D9E2E1] text-[#101828] hover:bg-[#F4F8F7] transition-colors"
         >
-          <ArrowLeft className="w-5 h-5" />
+          <ArrowLeft className="w-4.5 h-4.5" />
         </Link>
         <div>
-          <span className="text-xs font-semibold text-amber-600 uppercase tracking-wider">Mutation & Title Amendment</span>
-          <h1 className="text-2xl font-bold text-slate-900 mt-0.5">Edit Land Title Record #{id}</h1>
+          <span className="text-xs font-bold text-[#D97706] uppercase tracking-wider">Mutation & Title Amendment</span>
+          <h1 className="text-xl sm:text-2xl font-extrabold text-[#034E4E] mt-0.5 tracking-tight">Edit Land Title Record #{id}</h1>
         </div>
       </div>
 
@@ -65,27 +64,27 @@ export const OfficerEditLandRecordPage: React.FC = () => {
       />
 
       {notice && (
-        <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-900 font-medium">
+        <div className="p-3 rounded bg-[#F4F8F7] border border-[#D9E2E1] text-xs text-[#034E4E]">
           {notice}
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-xs space-y-8">
+      <form onSubmit={handleSubmit} className="tracia-card p-6 sm:p-8 space-y-8">
         {/* Registration Section */}
         <div className="space-y-4">
-          <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider pb-2 border-b border-slate-200 flex items-center space-x-2">
-            <Building className="w-4 h-4 text-blue-700" />
+          <h3 className="text-xs font-extrabold text-[#101828] uppercase tracking-wider pb-2 border-b border-[#D9E2E1] flex items-center space-x-2">
+            <Building className="w-4 h-4 text-[#034E4E]" />
             <span>1. Registration & Deed Information</span>
           </h3>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Document Type</label>
+              <label className="block text-xs font-bold text-[#101828] mb-1">Document Type</label>
               <select
                 name="document_type"
                 value={formData.document_type}
                 onChange={handleChange}
-                className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-lg"
+                className="w-full px-3 py-2 text-xs bg-white border border-[#D9E2E1] rounded-md focus:border-[#034E4E] focus:outline-none"
               >
                 <option value="Sale Deed">Sale Deed</option>
                 <option value="Gift Deed">Gift Deed</option>
@@ -95,35 +94,35 @@ export const OfficerEditLandRecordPage: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Document Number</label>
+              <label className="block text-xs font-bold text-[#101828] mb-1">Document Number</label>
               <input
                 type="text"
                 name="document_number"
                 value={formData.document_number}
                 onChange={handleChange}
-                className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-lg"
+                className="w-full px-3 py-2 text-xs bg-white border border-[#D9E2E1] rounded-md focus:border-[#034E4E] focus:outline-none"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Registration Date</label>
+              <label className="block text-xs font-bold text-[#101828] mb-1">Registration Date</label>
               <input
                 type="date"
                 name="registration_date"
                 value={formData.registration_date}
                 onChange={handleChange}
-                className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-lg"
+                className="w-full px-3 py-2 text-xs bg-white border border-[#D9E2E1] rounded-md focus:border-[#034E4E] focus:outline-none"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Registration Office</label>
+              <label className="block text-xs font-bold text-[#101828] mb-1">Registration Office</label>
               <input
                 type="text"
                 name="registration_office"
                 value={formData.registration_office}
                 onChange={handleChange}
-                className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-lg"
+                className="w-full px-3 py-2 text-xs bg-white border border-[#D9E2E1] rounded-md focus:border-[#034E4E] focus:outline-none"
               />
             </div>
           </div>
@@ -131,97 +130,97 @@ export const OfficerEditLandRecordPage: React.FC = () => {
 
         {/* Location Section */}
         <div className="space-y-4">
-          <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider pb-2 border-b border-slate-200 flex items-center space-x-2">
-            <MapPin className="w-4 h-4 text-blue-700" />
+          <h3 className="text-xs font-extrabold text-[#101828] uppercase tracking-wider pb-2 border-b border-[#D9E2E1] flex items-center space-x-2">
+            <MapPin className="w-4 h-4 text-[#034E4E]" />
             <span>2. Location & Property Parameters</span>
           </h3>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">District</label>
+              <label className="block text-xs font-bold text-[#101828] mb-1">District</label>
               <input
                 type="text"
                 name="district"
                 value={formData.district}
                 onChange={handleChange}
-                className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-lg"
+                className="w-full px-3 py-2 text-xs bg-white border border-[#D9E2E1] rounded-md focus:border-[#034E4E] focus:outline-none"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Taluk</label>
+              <label className="block text-xs font-bold text-[#101828] mb-1">Taluk</label>
               <input
                 type="text"
                 name="taluk"
                 value={formData.taluk}
                 onChange={handleChange}
-                className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-lg"
+                className="w-full px-3 py-2 text-xs bg-white border border-[#D9E2E1] rounded-md focus:border-[#034E4E] focus:outline-none"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Village</label>
+              <label className="block text-xs font-bold text-[#101828] mb-1">Village</label>
               <input
                 type="text"
                 name="village"
                 value={formData.village}
                 onChange={handleChange}
-                className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-lg"
+                className="w-full px-3 py-2 text-xs bg-white border border-[#D9E2E1] rounded-md focus:border-[#034E4E] focus:outline-none"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Survey Number</label>
+              <label className="block text-xs font-bold text-[#101828] mb-1">Survey Number</label>
               <input
                 type="text"
                 name="survey_number"
                 value={formData.survey_number}
                 onChange={handleChange}
-                className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-lg"
+                className="w-full px-3 py-2 text-xs bg-white border border-[#D9E2E1] rounded-md focus:border-[#034E4E] focus:outline-none"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Patta Number</label>
+              <label className="block text-xs font-bold text-[#101828] mb-1">Patta Number</label>
               <input
                 type="text"
                 name="patta_number"
                 value={formData.patta_number}
                 onChange={handleChange}
-                className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-lg"
+                className="w-full px-3 py-2 text-xs bg-white border border-[#D9E2E1] rounded-md focus:border-[#034E4E] focus:outline-none"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Property Extent</label>
+              <label className="block text-xs font-bold text-[#101828] mb-1">Property Extent</label>
               <input
                 type="text"
                 name="property_extent"
                 value={formData.property_extent}
                 onChange={handleChange}
-                className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-lg"
+                className="w-full px-3 py-2 text-xs bg-white border border-[#D9E2E1] rounded-md focus:border-[#034E4E] focus:outline-none"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Land Classification</label>
+              <label className="block text-xs font-bold text-[#101828] mb-1">Land Classification</label>
               <input
                 type="text"
                 name="land_type"
                 value={formData.land_type}
                 onChange={handleChange}
-                className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-lg"
+                className="w-full px-3 py-2 text-xs bg-white border border-[#D9E2E1] rounded-md focus:border-[#034E4E] focus:outline-none"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Sale Consideration (₹)</label>
+              <label className="block text-xs font-bold text-[#101828] mb-1">Sale Consideration (₹)</label>
               <input
                 type="number"
                 name="sale_consideration"
                 value={formData.sale_consideration}
                 onChange={handleChange}
-                className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-lg"
+                className="w-full px-3 py-2 text-xs bg-white border border-[#D9E2E1] rounded-md focus:border-[#034E4E] focus:outline-none"
               />
             </div>
           </div>
@@ -229,71 +228,71 @@ export const OfficerEditLandRecordPage: React.FC = () => {
 
         {/* Ownership Section */}
         <div className="space-y-4">
-          <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider pb-2 border-b border-slate-200 flex items-center space-x-2">
-            <User className="w-4 h-4 text-blue-700" />
+          <h3 className="text-xs font-extrabold text-[#101828] uppercase tracking-wider pb-2 border-b border-[#D9E2E1] flex items-center space-x-2">
+            <User className="w-4 h-4 text-[#034E4E]" />
             <span>3. Ownership Information</span>
           </h3>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Owner Name</label>
+              <label className="block text-xs font-bold text-[#101828] mb-1">Owner Name</label>
               <input
                 type="text"
                 name="owner_name"
                 value={formData.owner_name}
                 onChange={handleChange}
-                className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-lg"
+                className="w-full px-3 py-2 text-xs bg-white border border-[#D9E2E1] rounded-md focus:border-[#034E4E] focus:outline-none"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Previous Owner</label>
+              <label className="block text-xs font-bold text-[#101828] mb-1">Previous Owner</label>
               <input
                 type="text"
                 name="previous_owner"
                 value={formData.previous_owner}
                 onChange={handleChange}
-                className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-lg"
+                className="w-full px-3 py-2 text-xs bg-white border border-[#D9E2E1] rounded-md focus:border-[#034E4E] focus:outline-none"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Parent Document</label>
+              <label className="block text-xs font-bold text-[#101828] mb-1">Parent Document</label>
               <input
                 type="text"
                 name="parent_document"
                 value={formData.parent_document}
                 onChange={handleChange}
-                className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-lg"
+                className="w-full px-3 py-2 text-xs bg-white border border-[#D9E2E1] rounded-md focus:border-[#034E4E] focus:outline-none"
               />
             </div>
 
             <div className="sm:col-span-3">
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Property Description</label>
+              <label className="block text-xs font-bold text-[#101828] mb-1">Property Description</label>
               <textarea
                 name="property_description"
                 rows={3}
                 value={formData.property_description}
                 onChange={handleChange}
-                className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-lg"
+                className="w-full px-3 py-2 text-xs bg-white border border-[#D9E2E1] rounded-md focus:border-[#034E4E] focus:outline-none"
               />
             </div>
           </div>
         </div>
 
         {/* Buttons */}
-        <div className="flex justify-end space-x-3 pt-4 border-t border-slate-200">
+        <div className="flex justify-end space-x-3 pt-4 border-t border-[#D9E2E1]">
           <button
             type="button"
             onClick={() => navigate('/officer/land-records')}
-            className="px-5 py-2.5 bg-slate-100 text-slate-700 text-xs font-semibold rounded-xl"
+            className="tracia-btn-secondary text-xs"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={loading}
-            className="px-6 py-2.5 bg-blue-700 hover:bg-blue-600 text-white text-xs font-semibold rounded-xl shadow-xs flex items-center space-x-2"
+            className="tracia-btn-primary inline-flex items-center space-x-2 text-xs disabled:opacity-50"
           >
             {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
             <span>Update Record</span>

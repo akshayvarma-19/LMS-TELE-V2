@@ -77,22 +77,22 @@ export const CitizenGrievanceDetailPage: React.FC = () => {
       <div className="flex items-center space-x-3">
         <Link
           to="/citizen/grievances"
-          className="p-2 rounded-lg bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors"
+          className="p-2 rounded-lg bg-white border border-[#D9E2E1] text-[#101828] hover:bg-[#F4F8F7] transition-colors"
         >
-          <ArrowLeft className="w-5 h-5" />
+          <ArrowLeft className="w-4.5 h-4.5" />
         </Link>
         <div>
           <div className="flex items-center space-x-2">
             <span className="text-xs font-semibold text-amber-600 uppercase tracking-wider">Grievance Ticket</span>
             <span className="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono">#{id}</span>
           </div>
-          <h1 className="text-2xl font-bold text-slate-900 mt-0.5">Grievance Details & Tracking</h1>
+          <h1 className="text-xl sm:text-2xl font-extrabold text-[#034E4E] mt-0.5 tracking-tight">Grievance Details & Tracking</h1>
         </div>
       </div>
 
       {/* Overview Card */}
-      <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+      <div className="tracia-card p-6 space-y-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-xs">
           <div>
             <span className="block text-xs font-medium text-slate-500">Grievance Number</span>
             <span className="font-semibold text-slate-900 font-mono">{grievance.id.slice(0, 8)}</span>
@@ -143,9 +143,9 @@ export const CitizenGrievanceDetailPage: React.FC = () => {
       </div>
 
       {/* Status Timeline UI Component */}
-      <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs">
-        <h2 className="text-base font-bold text-slate-900 mb-4 flex items-center space-x-2">
-          <Clock className="w-5 h-5 text-blue-700" />
+      <div className="tracia-card p-6">
+        <h2 className="text-xs font-extrabold text-[#101828] uppercase tracking-wider mb-4 flex items-center space-x-2 border-b border-[#D9E2E1] pb-3">
+          <Clock className="w-4 h-4 text-[#034E4E]" />
           <span>Resolution Lifecycle Timeline</span>
         </h2>
 

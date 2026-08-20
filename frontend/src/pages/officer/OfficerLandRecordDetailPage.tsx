@@ -13,22 +13,22 @@ export const OfficerLandRecordDetailPage: React.FC = () => {
         <div className="flex items-center space-x-3">
           <Link
             to="/officer/land-records"
-            className="p-2 rounded-lg bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors"
+            className="p-2 rounded-lg bg-white border border-[#D9E2E1] text-[#101828] hover:bg-[#F4F8F7] transition-colors"
           >
-            <ArrowLeft className="w-5 h-5" />
+            <ArrowLeft className="w-4.5 h-4.5" />
           </Link>
           <div>
             <div className="flex items-center space-x-2">
-              <span className="text-xs font-semibold text-amber-600 uppercase tracking-wider">Officer Master Registry View</span>
-              <span className="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono">ID: {id || 'RECORD-ID'}</span>
+              <span className="text-xs font-bold text-[#D97706] uppercase tracking-wider">Officer Master Registry View</span>
+              <span className="text-[11px] bg-[#F4F8F7] text-[#034E4E] px-2 py-0.5 rounded font-mono border border-[#D9E2E1]">ID: {id || 'RECORD-ID'}</span>
             </div>
-            <h1 className="text-2xl font-bold text-slate-900 mt-0.5">Full Administrative Record (16 Fields)</h1>
+            <h1 className="text-xl sm:text-2xl font-extrabold text-[#034E4E] mt-0.5 tracking-tight">Full Administrative Record (16 Fields)</h1>
           </div>
         </div>
 
         <Link
           to={`/officer/land-records/${id || 'demo'}/edit`}
-          className="inline-flex items-center space-x-2 px-4 py-2 bg-blue-700 hover:bg-blue-600 text-white text-xs font-semibold rounded-xl shadow-xs transition-colors"
+          className="tracia-btn-primary inline-flex items-center space-x-2 text-xs self-start sm:self-auto"
         >
           <Edit className="w-4 h-4" />
           <span>Edit Record</span>
@@ -36,99 +36,99 @@ export const OfficerLandRecordDetailPage: React.FC = () => {
       </div>
 
       <ErrorAlert
-        title="Backend Disconnected"
+        title="Backend Notice"
         message="Master database record details, audit logs, and mutation history will be fetched from Supabase."
       />
 
       {/* 16 Core Fields Layout Grid */}
-      <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-6">
+      <div className="tracia-card p-6 space-y-6">
         <div>
-          <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider pb-2 border-b border-slate-200 flex items-center space-x-2">
-            <Building className="w-4 h-4 text-blue-700" />
+          <h2 className="text-xs font-extrabold text-[#101828] uppercase tracking-wider pb-2 border-b border-[#D9E2E1] flex items-center space-x-2">
+            <Building className="w-4 h-4 text-[#034E4E]" />
             <span>1. Registration & Deed Information</span>
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-4 text-sm">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-4 text-xs">
             <div>
-              <span className="block text-xs font-medium text-slate-500">Document Type</span>
-              <span className="font-medium text-slate-800">--</span>
+              <span className="block font-medium text-[#667085]">Document Type</span>
+              <span className="font-bold text-[#101828] mt-0.5 block">--</span>
             </div>
             <div>
-              <span className="block text-xs font-medium text-slate-500">Document Number</span>
-              <span className="font-medium text-slate-800 font-mono">--</span>
+              <span className="block font-medium text-[#667085]">Document Number</span>
+              <span className="font-bold text-[#101828] font-mono mt-0.5 block">--</span>
             </div>
             <div>
-              <span className="block text-xs font-medium text-slate-500">Registration Date</span>
-              <span className="font-medium text-slate-800">--</span>
+              <span className="block font-medium text-[#667085]">Registration Date</span>
+              <span className="font-bold text-[#101828] mt-0.5 block">--</span>
             </div>
             <div>
-              <span className="block text-xs font-medium text-slate-500">Registration Office</span>
-              <span className="font-medium text-slate-800">--</span>
+              <span className="block font-medium text-[#667085]">Registration Office</span>
+              <span className="font-bold text-[#101828] mt-0.5 block">--</span>
             </div>
           </div>
         </div>
 
         <div>
-          <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider pb-2 border-b border-slate-200 flex items-center space-x-2">
-            <FileText className="w-4 h-4 text-blue-700" />
+          <h2 className="text-xs font-extrabold text-[#101828] uppercase tracking-wider pb-2 border-b border-[#D9E2E1] flex items-center space-x-2">
+            <FileText className="w-4 h-4 text-[#034E4E]" />
             <span>2. Location & Property Details</span>
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-4 text-sm">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-4 text-xs">
             <div>
-              <span className="block text-xs font-medium text-slate-500">District</span>
-              <span className="font-medium text-slate-800">--</span>
+              <span className="block font-medium text-[#667085]">District</span>
+              <span className="font-bold text-[#101828] mt-0.5 block">--</span>
             </div>
             <div>
-              <span className="block text-xs font-medium text-slate-500">Taluk</span>
-              <span className="font-medium text-slate-800">--</span>
+              <span className="block font-medium text-[#667085]">Taluk</span>
+              <span className="font-bold text-[#101828] mt-0.5 block">--</span>
             </div>
             <div>
-              <span className="block text-xs font-medium text-slate-500">Village</span>
-              <span className="font-medium text-slate-800">--</span>
+              <span className="block font-medium text-[#667085]">Village</span>
+              <span className="font-bold text-[#101828] mt-0.5 block">--</span>
             </div>
             <div>
-              <span className="block text-xs font-medium text-slate-500">Survey Number</span>
-              <span className="font-medium text-slate-800 font-mono">--</span>
+              <span className="block font-medium text-[#667085]">Survey Number</span>
+              <span className="font-bold text-[#101828] font-mono mt-0.5 block">--</span>
             </div>
             <div>
-              <span className="block text-xs font-medium text-slate-500">Patta Number</span>
-              <span className="font-medium text-slate-800 font-mono">--</span>
+              <span className="block font-medium text-[#667085]">Patta Number</span>
+              <span className="font-bold text-[#101828] font-mono mt-0.5 block">--</span>
             </div>
             <div>
-              <span className="block text-xs font-medium text-slate-500">Property Extent</span>
-              <span className="font-medium text-slate-800">--</span>
+              <span className="block font-medium text-[#667085]">Property Extent</span>
+              <span className="font-bold text-[#101828] mt-0.5 block">--</span>
             </div>
             <div>
-              <span className="block text-xs font-medium text-slate-500">Land Type</span>
-              <span className="font-medium text-slate-800">--</span>
+              <span className="block font-medium text-[#667085]">Land Type</span>
+              <span className="font-bold text-[#101828] mt-0.5 block">--</span>
             </div>
             <div>
-              <span className="block text-xs font-medium text-slate-500">Sale Consideration (₹)</span>
-              <span className="font-medium text-slate-800">--</span>
+              <span className="block font-medium text-[#667085]">Sale Consideration (₹)</span>
+              <span className="font-bold text-[#101828] mt-0.5 block">--</span>
             </div>
           </div>
         </div>
 
         <div>
-          <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider pb-2 border-b border-slate-200 flex items-center space-x-2">
-            <User className="w-4 h-4 text-blue-700" />
+          <h2 className="text-xs font-extrabold text-[#101828] uppercase tracking-wider pb-2 border-b border-[#D9E2E1] flex items-center space-x-2">
+            <User className="w-4 h-4 text-[#034E4E]" />
             <span>3. Ownership Information</span>
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4 text-sm">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4 text-xs">
             <div>
-              <span className="block text-xs font-medium text-slate-500">Current Owner Name</span>
-              <span className="font-medium text-slate-800">--</span>
+              <span className="block font-medium text-[#667085]">Current Owner Name</span>
+              <span className="font-bold text-[#101828] mt-0.5 block">--</span>
             </div>
             <div>
-              <span className="block text-xs font-medium text-slate-500">Previous Owner</span>
-              <span className="font-medium text-slate-800">--</span>
+              <span className="block font-medium text-[#667085]">Previous Owner</span>
+              <span className="font-bold text-[#101828] mt-0.5 block">--</span>
             </div>
             <div>
-              <span className="block text-xs font-medium text-slate-500">Parent Document Reference</span>
-              <span className="font-medium text-slate-800">--</span>
+              <span className="block font-medium text-[#667085]">Parent Document Reference</span>
+              <span className="font-bold text-[#101828] mt-0.5 block">--</span>
             </div>
             <div className="sm:col-span-3">
-              <span className="block text-xs font-medium text-slate-500">Property Description</span>
-              <span className="font-medium text-slate-800">--</span>
+              <span className="block font-medium text-[#667085]">Property Description</span>
+              <span className="font-bold text-[#101828] mt-0.5 block">--</span>
             </div>
           </div>
         </div>

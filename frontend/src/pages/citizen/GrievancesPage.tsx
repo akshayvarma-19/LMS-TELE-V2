@@ -107,8 +107,8 @@ export const CitizenGrievancesPage: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">My Grievances</h1>
-          <p className="text-sm text-slate-500 mt-1">
+          <h1 className="text-xl sm:text-2xl font-extrabold text-[#034E4E] tracking-tight">My Grievances</h1>
+          <p className="text-xs sm:text-sm text-[#667085] mt-1">
             Track reported title mismatches, survey disputes, and officer resolution status updates.
           </p>
         </div>
@@ -133,13 +133,13 @@ export const CitizenGrievancesPage: React.FC = () => {
       )}
 
       {/* Filters */}
-      <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs flex flex-col sm:flex-row gap-3">
+      <div className="tracia-card p-4 flex flex-col sm:flex-row gap-3">
         <div className="sm:w-48 relative">
-          <Filter className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
+          <Filter className="w-4 h-4 absolute left-3 top-2.5 text-[#667085]" />
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
+            className="w-full pl-9 pr-4 py-2 text-xs sm:text-sm bg-white border border-[#D9E2E1] rounded-md focus:border-[#034E4E] focus:outline-none"
           >
             <option value="">All Statuses</option>
             <option value="submitted">Submitted</option>
@@ -154,7 +154,7 @@ export const CitizenGrievancesPage: React.FC = () => {
           <select
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
-            className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
+            className="w-full px-3 py-2 text-xs sm:text-sm bg-white border border-[#D9E2E1] rounded-md focus:border-[#034E4E] focus:outline-none"
           >
             <option value="">All Categories</option>
             <option value="ocr_mismatch">OCR Field Mismatch</option>
@@ -221,11 +221,11 @@ export const CitizenGrievancesPage: React.FC = () => {
 
       {/* Raise Grievance Modal */}
       {showNewModal && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl border border-slate-200 max-w-lg w-full p-6 shadow-2xl space-y-4">
-            <div className="flex justify-between items-center border-b border-slate-200 pb-3">
-              <h3 className="text-base font-bold text-slate-900">Lodge Title Grievance</h3>
-              <button onClick={() => setShowNewModal(false)} className="text-slate-400 hover:text-slate-600 text-sm">
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg border border-[#D9E2E1] max-w-lg w-full p-6 space-y-4 shadow-lg">
+            <div className="flex justify-between items-center border-b border-[#D9E2E1] pb-3">
+              <h3 className="text-sm font-extrabold text-[#101828]">Lodge Title Grievance</h3>
+              <button onClick={() => setShowNewModal(false)} className="text-[#667085] hover:text-[#101828] text-sm">
                 ✕
               </button>
             </div>
@@ -270,14 +270,14 @@ export const CitizenGrievancesPage: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">Description & Supporting Facts</label>
+                <label className="block text-xs font-bold text-[#101828] mb-1">Description & Supporting Facts</label>
                 <textarea
                   rows={4}
                   required
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Provide detailed explanation of the discrepancy..."
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm"
+                  className="w-full px-3 py-2 bg-white border border-[#D9E2E1] rounded-md text-xs sm:text-sm focus:border-[#034E4E] focus:outline-none"
                 />
               </div>
 
@@ -285,7 +285,7 @@ export const CitizenGrievancesPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setShowNewModal(false)}
-                  className="px-4 py-2 bg-slate-100 text-slate-700 text-xs font-semibold rounded-xl"
+                  className="tracia-btn-secondary text-xs"
                 >
                   Cancel
                 </button>

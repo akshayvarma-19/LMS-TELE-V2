@@ -7,10 +7,10 @@ interface LoadingStateProps {
 
 export const LoadingState: React.FC<LoadingStateProps> = ({ message = 'Connecting to service...' }) => {
   return (
-    <div className="flex flex-col items-center justify-center p-12 text-center rounded-xl bg-white border border-[#E5E5E5] my-4">
-      <Loader2 className="w-8 h-8 text-[rgb(3,78,78)] animate-spin mb-3" />
-      <p className="text-sm font-medium text-[#1F1F1F]">{message}</p>
-      <p className="text-xs text-[#1F1F1F]/60 mt-1">Awaiting backend response</p>
+    <div className="flex flex-col items-center justify-center p-12 text-center rounded-lg bg-white border border-[#D9E2E1] my-4">
+      <Loader2 className="w-8 h-8 text-[#034E4E] animate-spin mb-3" />
+      <p className="text-sm font-semibold text-[#101828]">{message}</p>
+      <p className="text-xs text-[#667085] mt-1">Awaiting TRACIA backend response</p>
     </div>
   );
 };

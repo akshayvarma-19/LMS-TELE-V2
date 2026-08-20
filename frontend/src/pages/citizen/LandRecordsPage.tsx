@@ -46,13 +46,11 @@ export const CitizenLandRecordsPage: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900">My Land Records</h1>
-          <p className="text-sm text-slate-500 mt-1">
-            Registered land holdings and official title documents associated with your identity.
-          </p>
-        </div>
+      <div>
+        <h1 className="text-xl sm:text-2xl font-extrabold text-[#034E4E] tracking-tight">My Land Records</h1>
+        <p className="text-xs sm:text-sm text-[#667085] mt-1">
+          Registered land holdings and official title documents associated with your identity.
+        </p>
       </div>
 
       {errorMsg && (
@@ -63,26 +61,26 @@ export const CitizenLandRecordsPage: React.FC = () => {
       )}
 
       {/* Search & Filter Controls */}
-      <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs flex flex-col sm:flex-row gap-3">
+      <div className="tracia-card p-4 flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
-          <Search className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
+          <Search className="w-4 h-4 absolute left-3 top-2.5 text-[#667085]" />
           <input
             type="text"
             placeholder="Search by survey number or patta number..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white"
+            className="w-full pl-9 pr-4 py-2 text-xs sm:text-sm bg-white border border-[#D9E2E1] rounded-md focus:border-[#034E4E] focus:outline-none"
           />
         </div>
 
         <div className="sm:w-48 relative">
-          <Filter className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
+          <Filter className="w-4 h-4 absolute left-3 top-2.5 text-[#667085]" />
           <input
             type="text"
             placeholder="Filter by village..."
             value={villageFilter}
             onChange={(e) => setVillageFilter(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white"
+            className="w-full pl-9 pr-4 py-2 text-xs sm:text-sm bg-white border border-[#D9E2E1] rounded-md focus:border-[#034E4E] focus:outline-none"
           />
         </div>
       </div>

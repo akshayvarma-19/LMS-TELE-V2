@@ -41,8 +41,8 @@ export const OfficerGrievancesPage: React.FC = () => {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-slate-900">Grievance Management Queue</h1>
-        <p className="text-sm text-slate-500 mt-1">
+        <h1 className="text-xl sm:text-2xl font-extrabold text-[#034E4E] tracking-tight">Grievance Management Queue</h1>
+        <p className="text-xs sm:text-sm text-[#667085] mt-1">
           Review, assign, request clarification, or resolve citizen title discrepancy petitions.
         </p>
       </div>
@@ -55,13 +55,13 @@ export const OfficerGrievancesPage: React.FC = () => {
       )}
 
       {/* Filters */}
-      <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs flex flex-col sm:flex-row gap-3">
+      <div className="tracia-card p-4 flex flex-col sm:flex-row gap-3">
         <div className="sm:w-48 relative">
-          <Filter className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
+          <Filter className="w-4 h-4 absolute left-3 top-2.5 text-[#667085]" />
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
+            className="w-full pl-9 pr-4 py-2 text-xs sm:text-sm bg-white border border-[#D9E2E1] rounded-md focus:border-[#034E4E] focus:outline-none"
           >
             <option value="">All Statuses</option>
             <option value="submitted">Submitted</option>
@@ -76,7 +76,7 @@ export const OfficerGrievancesPage: React.FC = () => {
           <select
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
-            className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
+            className="w-full px-3 py-2 text-xs sm:text-sm bg-white border border-[#D9E2E1] rounded-md focus:border-[#034E4E] focus:outline-none"
           >
             <option value="">All Categories</option>
             <option value="ocr_mismatch">OCR Field Mismatch</option>

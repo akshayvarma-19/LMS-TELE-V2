@@ -88,8 +88,8 @@ export const CitizenOcrPage: React.FC = () => {
     <div className="space-y-6 max-w-5xl mx-auto">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-slate-900">Document OCR Verification</h1>
-        <p className="text-sm text-slate-500 mt-1">
+        <h1 className="text-xl sm:text-2xl font-extrabold text-[#034E4E] tracking-tight">Document OCR Verification</h1>
+        <p className="text-xs sm:text-sm text-[#667085] mt-1">
           Upload physical deed copies (PDF, JPG, PNG) to verify extracted text against official digital registry records.
         </p>
       </div>
@@ -107,37 +107,37 @@ export const CitizenOcrPage: React.FC = () => {
       )}
 
       {/* Workflow Step Progress */}
-      <div className="grid grid-cols-4 gap-2 bg-white p-3 rounded-xl border border-slate-200 text-center text-xs font-semibold text-slate-600">
-        <div className={`p-2 rounded-lg ${step === 'select' ? 'bg-blue-700 text-white' : 'bg-slate-100'}`}>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 tracia-card p-2 text-center text-xs font-bold">
+        <div className={`p-2 rounded-md ${step === 'select' ? 'bg-[#034E4E] text-white' : 'bg-[#F4F8F7] text-[#667085]'}`}>
           1. Select Title
         </div>
-        <div className={`p-2 rounded-lg ${step === 'upload' ? 'bg-blue-700 text-white' : 'bg-slate-100'}`}>
+        <div className={`p-2 rounded-md ${step === 'upload' ? 'bg-[#034E4E] text-white' : 'bg-[#F4F8F7] text-[#667085]'}`}>
           2. Upload File
         </div>
-        <div className={`p-2 rounded-lg ${step === 'processing' ? 'bg-blue-700 text-white' : 'bg-slate-100'}`}>
+        <div className={`p-2 rounded-md ${step === 'processing' ? 'bg-[#034E4E] text-white' : 'bg-[#F4F8F7] text-[#667085]'}`}>
           3. Process OCR
         </div>
-        <div className={`p-2 rounded-lg ${step === 'result' ? 'bg-blue-700 text-white' : 'bg-slate-100'}`}>
+        <div className={`p-2 rounded-md ${step === 'result' ? 'bg-[#034E4E] text-white' : 'bg-[#F4F8F7] text-[#667085]'}`}>
           4. Review Field Match
         </div>
       </div>
 
       {/* Main Upload Card */}
-      <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs">
+      <div className="tracia-card p-6">
         <form onSubmit={handleStartOcr} className="space-y-6">
           {/* Step 1: Select Own Land Record */}
           <div>
-            <label className="block text-sm font-bold text-slate-900 mb-1">
-              Select Your Registered Land Title <span className="text-rose-500">*</span>
+            <label className="block text-xs font-bold text-[#101828] mb-1">
+              Select Your Registered Land Title <span className="text-rose-600">*</span>
             </label>
-            <p className="text-xs text-slate-500 mb-2">Choose the land property you wish to verify against your uploaded document.</p>
+            <p className="text-xs text-[#667085] mb-2">Choose the land property you wish to verify against your uploaded document.</p>
             <select
               value={selectedLandId}
               onChange={(e) => {
                 setSelectedLandId(e.target.value);
                 if (e.target.value) setStep('upload');
               }}
-              className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-600"
+              className="w-full px-3 py-2 bg-white border border-[#D9E2E1] rounded-md text-xs sm:text-sm text-[#101828] focus:border-[#034E4E] focus:outline-none"
             >
               <option value="">-- Select Registered Property --</option>
               {lands.map((land) => (
@@ -232,13 +232,13 @@ export const CitizenOcrPage: React.FC = () => {
 
           {/* Field Comparison Table */}
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead className="bg-slate-100 text-slate-700 uppercase font-semibold">
+            <table className="w-full text-left text-xs border border-[#D9E2E1] rounded-lg">
+              <thead className="bg-[#F4F8F7] text-[#034E4E] uppercase font-bold text-[11px] border-b border-[#D9E2E1]">
                 <tr>
-                  <th className="p-3 rounded-l-lg">Field Name</th>
+                  <th className="p-3">Field Name</th>
                   <th className="p-3">Official Record</th>
                   <th className="p-3">Extracted Document Value</th>
-                  <th className="p-3 rounded-r-lg">Match Result</th>
+                  <th className="p-3">Match Result</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200 text-slate-800">
