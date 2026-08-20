@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   FileText,
@@ -9,11 +9,55 @@ import {
   Database,
   ChevronRight,
   ShieldCheck,
+  Loader2
 } from 'lucide-react';
 import { ErrorAlert } from '../../components/common/ErrorAlert';
 import { EmptyState } from '../../components/common/EmptyState';
+import { landService } from '../../services/landService';
+import { grievanceService } from '../../services/grievanceService';
+import { ocrService } from '../../services/ocrService';
+import type { LandRecord, Grievance, LandDocument } from '../../types';
 
 export const OfficerDashboardPage: React.FC = () => {
+  const [landRecords, setLandRecords] = useState<LandRecord[]>([]);
+  const [grievances, setGrievances] = useState<Grievance[]>([]);
+  const [documents, setDocuments] = useState<LandDocument[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchDashboardMetrics = async () => {
+      setLoading(true);
+      setErrorMsg(null);
+      try {
+        const [landsRes, grievancesRes, docsRes] = await Promise.all([
+          landService.getMyLandRecords(),
+          grievanceService.getAllGrievances(),
+          ocrService.getAllDocuments()
+        ]);
+
+        if ((landsRes.status === 'success' || landsRes.success) && Array.isArray(landsRes.data)) {
+          setLandRecords(landsRes.data);
+        }
+        if ((grievancesRes.status === 'success' || grievancesRes.success) && Array.isArray(grievancesRes.data)) {
+          setGrievances(grievancesRes.data);
+        }
+        if ((docsRes.status === 'success' || docsRes.success) && Array.isArray(docsRes.data)) {
+          setDocuments(docsRes.data);
+        }
+      } catch (err: any) {
+        console.error('Failed to load officer dashboard data:', err);
+        setErrorMsg(err.message || 'Error loading administrative telemetry metrics.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchDashboardMetrics();
+  }, []);
+
+  const pendingGrievances = grievances.filter(g => g.status === 'submitted' || g.status === 'under_review');
+  const ocrMismatches = grievances.filter(g => g.category === 'ocr_mismatch').length + documents.filter(d => d.ocr_status === 'completed' || d.ocr_status === 'failed').length;
+
   return (
     <div className="space-y-6">
       {/* Officer Hero Banner */}
@@ -69,10 +113,7 @@ export const OfficerDashboardPage: React.FC = () => {
         </div>
       </div>
 
-      <ErrorAlert
-        title="Backend Status"
-        message="System telemetry metrics, total title count, active grievance queues, and anomaly scores will refresh automatically from the Supabase database."
-      />
+      {errorMsg && <ErrorAlert title="Dashboard Notice" message={errorMsg} />}
 
       {/* Officer Metric Cards Grid (Unified System) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -83,8 +124,10 @@ export const OfficerDashboardPage: React.FC = () => {
               <FileText className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-xl font-extrabold text-[#101828] font-mono">--</div>
-          <p className="text-[11px] text-[#667085] mt-1">Awaiting backend data</p>
+          <div className="text-xl font-extrabold text-[#101828] font-mono">
+            {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : landRecords.length}
+          </div>
+          <p className="text-[11px] text-[#667085] mt-1">Master registry titles</p>
         </div>
 
         <div className="tracia-card p-5">
@@ -94,8 +137,10 @@ export const OfficerDashboardPage: React.FC = () => {
               <AlertOctagon className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-xl font-extrabold text-[#101828] font-mono">--</div>
-          <p className="text-[11px] text-[#667085] mt-1">Awaiting backend data</p>
+          <div className="text-xl font-extrabold text-[#101828] font-mono">
+            {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : pendingGrievances.length}
+          </div>
+          <p className="text-[11px] text-[#667085] mt-1">Requires officer action</p>
         </div>
 
         <div className="tracia-card p-5">
@@ -105,8 +150,10 @@ export const OfficerDashboardPage: React.FC = () => {
               <FolderKanban className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-xl font-extrabold text-[#101828] font-mono">--</div>
-          <p className="text-[11px] text-[#667085] mt-1">Awaiting backend data</p>
+          <div className="text-xl font-extrabold text-[#101828] font-mono">
+            {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : grievances.filter(g => g.status === 'under_review').length}
+          </div>
+          <p className="text-[11px] text-[#667085] mt-1">Active investigations</p>
         </div>
 
         <div className="tracia-card p-5">
@@ -116,8 +163,10 @@ export const OfficerDashboardPage: React.FC = () => {
               <ShieldAlert className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-xl font-extrabold text-[#101828] font-mono">--</div>
-          <p className="text-[11px] text-[#667085] mt-1">Awaiting backend data</p>
+          <div className="text-xl font-extrabold text-[#101828] font-mono">
+            {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : ocrMismatches}
+          </div>
+          <p className="text-[11px] text-[#667085] mt-1">OCR mismatches & disputes</p>
         </div>
 
         <div className="tracia-card p-5">
@@ -127,19 +176,23 @@ export const OfficerDashboardPage: React.FC = () => {
               <FileText className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-xl font-extrabold text-[#101828] font-mono">--</div>
-          <p className="text-[11px] text-[#667085] mt-1">Awaiting backend data</p>
+          <div className="text-xl font-extrabold text-[#101828] font-mono">
+            {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : documents.length}
+          </div>
+          <p className="text-[11px] text-[#667085] mt-1">Uploaded deed documents</p>
         </div>
 
         <div className="tracia-card p-5">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-bold text-[#667085] uppercase tracking-wider">Recent System Updates</span>
+            <span className="text-xs font-bold text-[#667085] uppercase tracking-wider">Resolved Petitions</span>
             <div className="w-8 h-8 rounded-lg bg-[#034E4E] text-white flex items-center justify-center shrink-0">
               <Database className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-xl font-extrabold text-[#101828] font-mono">--</div>
-          <p className="text-[11px] text-[#667085] mt-1">Awaiting backend data</p>
+          <div className="text-xl font-extrabold text-[#101828] font-mono">
+            {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : grievances.filter(g => g.status === 'resolved').length}
+          </div>
+          <p className="text-[11px] text-[#667085] mt-1">Completed reviews</p>
         </div>
       </div>
 
@@ -157,10 +210,24 @@ export const OfficerDashboardPage: React.FC = () => {
               <ChevronRight className="w-3.5 h-3.5 ml-0.5" />
             </Link>
           </div>
-          <EmptyState
-            title="No land records found."
-            description="Registry titles created by officers will appear here for editing and mutation management."
-          />
+          
+          {loading ? (
+            <div className="py-8 flex justify-center"><Loader2 className="w-6 h-6 animate-spin text-[#034E4E]" /></div>
+          ) : landRecords.length === 0 ? (
+            <EmptyState title="No land records found." description="Registry titles created by officers will appear here." />
+          ) : (
+            <div className="space-y-3">
+              {landRecords.slice(0, 4).map((land) => (
+                <Link key={land.id} to={`/officer/land-records/${land.id}`} className="block p-3 rounded-xl bg-slate-50 hover:bg-[#F4F8F7] border border-slate-200 transition-colors">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="font-bold text-slate-900">{land.village} (Survey: {land.survey_number})</span>
+                    <span className="font-mono text-[11px] bg-white px-2 py-0.5 rounded border border-slate-200 text-[#034E4E]">{land.land_id}</span>
+                  </div>
+                  <p className="text-[11px] text-slate-500 mt-1">Owner: {land.owner_name} • District: {land.district}</p>
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Grievance Work Queue */}
@@ -175,10 +242,24 @@ export const OfficerDashboardPage: React.FC = () => {
               <ChevronRight className="w-3.5 h-3.5 ml-0.5" />
             </Link>
           </div>
-          <EmptyState
-            title="No pending grievances."
-            description="Citizen title disputes and OCR mismatch reports will queue here for revenue officer review."
-          />
+
+          {loading ? (
+            <div className="py-8 flex justify-center"><Loader2 className="w-6 h-6 animate-spin text-[#034E4E]" /></div>
+          ) : grievances.length === 0 ? (
+            <EmptyState title="No pending grievances." description="Citizen title disputes and OCR mismatch reports will queue here." />
+          ) : (
+            <div className="space-y-3">
+              {grievances.slice(0, 4).map((g) => (
+                <Link key={g.id} to={`/officer/grievances/${g.id}`} className="block p-3 rounded-xl bg-slate-50 hover:bg-amber-50 border border-slate-200 transition-colors">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="font-bold text-slate-900 capitalize">{g.category.replace(/_/g, ' ')}</span>
+                    <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-amber-100 text-amber-800">{g.status}</span>
+                  </div>
+                  <p className="text-[11px] text-slate-600 mt-1 line-clamp-1">{g.description}</p>
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

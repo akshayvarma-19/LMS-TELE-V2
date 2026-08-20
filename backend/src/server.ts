@@ -1,6 +1,8 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 import express, { Request, Response } from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
 import { supabase } from './lib/supabase.js';
 import authRouter from './routes/auth.js';
 import recordsRouter from './routes/records.js';
@@ -13,8 +15,6 @@ import ocrExtractionRouter from './routes/ocrExtractionRoutes.js';
 import assistantRouter from './routes/assistantRoutes.js';
 import mapRouter from './routes/mapRoutes.js';
 import notificationRouter from './routes/notificationRoutes.js';
-
-dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
