@@ -1,4 +1,4 @@
-import { supabase } from '../lib/supabase.js';
+import { supabaseAdmin } from '../lib/supabase.js';
 
 export interface VerificationFieldResult {
   field: string;
@@ -12,6 +12,7 @@ export interface VerificationResult {
   mismatchCount: number;
   canRaiseGrievance: boolean;
   fields: VerificationFieldResult[];
+  ocr_confidence?: number | null;
 }
 
 function normalizeText(val: string | null | undefined): string {
@@ -67,7 +68,7 @@ export const ocrVerificationService = {
    */
   async verifyOcr(id: string, citizenId: string): Promise<VerificationResult> {
     // 1. Get OCR document record
-    const { data: document, error: docError } = await supabase
+    const { data: document, error: docError } = await supabaseAdmin
       .from('land_documents')
       .select('*')
       .eq('id', id)
@@ -97,7 +98,7 @@ export const ocrVerificationService = {
     }
 
     // 3. Get corresponding official land record
-    const { data: land, error: landError } = await supabase
+    const { data: land, error: landError } = await supabaseAdmin
       .from('land_records')
       .select('*')
       .eq('id', document.land_id)
@@ -180,11 +181,18 @@ export const ocrVerificationService = {
 
     const overallStatus = mismatchCount > 0 ? 'MISMATCH' : 'MATCH';
 
+    let ocr_confidence: number | null = null;
+    const confidenceMatch = (document.extracted_text || '').match(/^\[OCR_CONFIDENCE:\s*(\d+)\]\n/);
+    if (confidenceMatch) {
+      ocr_confidence = parseInt(confidenceMatch[1], 10);
+    }
+
     return {
       overallStatus,
       mismatchCount,
       canRaiseGrievance: mismatchCount > 0,
-      fields: results
+      fields: results,
+      ocr_confidence
     };
   }
 };

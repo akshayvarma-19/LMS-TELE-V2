@@ -194,6 +194,7 @@ export interface VerificationResult {
   mismatchCount: number;
   canRaiseGrievance: boolean;
   fields: VerificationFieldResult[];
+  ocr_confidence?: number | null;
 }
 
 export type ApplicationStatus = 'submitted' | 'under_review' | 'info_required' | 'approved' | 'rejected';

@@ -3,11 +3,21 @@ import { AuthenticatedRequest } from '../middleware/auth.js';
 import { supabaseAdmin } from '../lib/supabase.js';
 import { ocrService } from '../services/ocrService.js';
 import { ocrVerificationService } from '../services/ocrVerificationService.js';
+import path from 'path';
 
 function mapDbDocumentToModel(dbDoc: any) {
   if (!dbDoc) return null;
+  let ocr_confidence: number | null = null;
+  let text = dbDoc.extracted_text || '';
+  const match = text.match(/^\[OCR_CONFIDENCE:\s*(\d+)\]\n/);
+  if (match) {
+    ocr_confidence = parseInt(match[1], 10);
+    text = text.substring(match[0].length);
+  }
   return {
     ...dbDoc,
+    extracted_text: text,
+    ocr_confidence,
     extracted_owner_name: dbDoc.extracted_owner || null,
     extracted_patta_number: dbDoc.extracted_patta || null,
     extracted_property_extent: dbDoc.extracted_area || null,
@@ -270,6 +280,42 @@ export const ocrExtractionController = {
           error: { message: 'land_id, file_name, and file_url are required.', code: 'BAD_REQUEST' }
         });
         return;
+      }
+
+      // File Extension Validation
+      const ext = path.extname(file_name).toLowerCase();
+      const allowedExts = ['.pdf', '.jpg', '.jpeg', '.png'];
+      const blockedExts = ['.exe', '.bat', '.sh', '.cmd', '.msi', '.js', '.ts', '.vbs', '.com', '.scr', '.pif'];
+      
+      if (blockedExts.includes(ext) || !allowedExts.includes(ext)) {
+        res.status(400).json({
+          success: false,
+          error: { message: `Invalid file type. File type ${ext} is not supported. Only PDF, JPG, JPEG, and PNG are allowed.`, code: 'INVALID_FILE_TYPE' }
+        });
+        return;
+      }
+
+      // File Size Validation for base64 / Data URL
+      if (file_url.startsWith('data:')) {
+        const commaIndex = file_url.indexOf(',');
+        const base64Str = commaIndex !== -1 ? file_url.substring(commaIndex + 1) : file_url;
+        const fileSize = Math.floor(base64Str.length * 0.75);
+
+        if (fileSize === 0) {
+          res.status(400).json({
+            success: false,
+            error: { message: 'File is empty or corrupt.', code: 'EMPTY_FILE' }
+          });
+          return;
+        }
+
+        if (fileSize > 10 * 1024 * 1024) {
+          res.status(400).json({
+            success: false,
+            error: { message: 'File exceeds the maximum limit of 10MB.', code: 'FILE_TOO_LARGE' }
+          });
+          return;
+        }
       }
 
       const { data: dbData, error: dbError } = await supabaseAdmin
