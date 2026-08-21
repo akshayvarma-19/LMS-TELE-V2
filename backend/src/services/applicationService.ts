@@ -68,12 +68,115 @@ const STATUS_DB_TO_UI: Record<string, string> = {
   'Rejected': 'rejected'
 };
 
-function mapStatusDbToUi(status: string): string {
-  return STATUS_DB_TO_UI[status] || status;
+function parseDescription(description: string, dbType: string, dbStatus: string) {
+  let uiType = dbType.toLowerCase();
+  let uiStatus = dbStatus.toLowerCase();
+  let documentName = '';
+  let details = description || '';
+
+  // Match UIStatus prefix
+  const statusMatch = details.match(/^\[UIStatus:\s*([^\]]+)\]/);
+  if (statusMatch) {
+    uiStatus = statusMatch[1];
+    details = details.substring(statusMatch[0].length);
+  }
+
+  // Match UIType prefix
+  const typeMatch = details.match(/^\[UIType:\s*([^\]]+)\]/);
+  if (typeMatch) {
+    uiType = typeMatch[1];
+    details = details.substring(typeMatch[0].length);
+  }
+
+  // Match DocName prefix
+  const docMatch = details.match(/^\[DocName:\s*([^\]]*)\]/);
+  if (docMatch) {
+    documentName = docMatch[1];
+    details = details.substring(docMatch[0].length);
+  }
+
+  return { uiType, uiStatus, documentName, details };
 }
 
-function mapStatusUiToDb(status: string): string {
-  return STATUS_UI_TO_DB[status] || status;
+async function mapDbToModel(dbApp: any) {
+  const { uiType, uiStatus, documentName, details } = parseDescription(dbApp.description, dbApp.application_type, dbApp.status);
+
+  // Fetch applicant name, email, phone from users table
+  const { data: user } = await supabase.from('users').select('*').eq('id', dbApp.citizen_id).maybeSingle();
+  
+  // Fetch land details from land_records table
+  const { data: land } = await supabase.from('land_records').select('*').eq('id', dbApp.land_id).maybeSingle();
+
+  return {
+    id: dbApp.id,
+    application_number: dbApp.application_number,
+    citizen_id: dbApp.citizen_id,
+    applicant_name: user?.name || 'Citizen',
+    email: user?.email || '',
+    phone: user?.phone || '',
+    land_id: dbApp.land_id,
+    survey_number: land?.survey_number || '',
+    patta_number: land?.patta_number || '',
+    village: land?.village || '',
+    taluk: land?.taluk || '',
+    district: land?.district || '',
+    property_extent: land?.land_extent_acres ? `${land.land_extent_acres} Acres` : '',
+    type: uiType,
+    details: details,
+    document_name: documentName,
+    status: uiStatus,
+    officer_remarks: dbApp.officer_remarks || '',
+    created_at: dbApp.submitted_at || dbApp.created_at || new Date().toISOString(),
+    updated_at: dbApp.updated_at || new Date().toISOString()
+  };
+}
+
+async function mapDbToModelBatch(dbApps: any[]) {
+  if (!dbApps || dbApps.length === 0) return [];
+
+  const citizenIds = Array.from(new Set(dbApps.map(a => a.citizen_id).filter(Boolean)));
+  const landIds = Array.from(new Set(dbApps.map(a => a.land_id).filter(Boolean)));
+
+  // Fetch users in batch
+  const { data: usersList } = citizenIds.length > 0
+    ? await supabase.from('users').select('*').in('id', citizenIds)
+    : { data: [] };
+  const userMap = new Map((usersList || []).map(u => [u.id, u]));
+
+  // Fetch lands in batch
+  const { data: landsList } = landIds.length > 0
+    ? await supabase.from('land_records').select('*').in('id', landIds)
+    : { data: [] };
+  const landMap = new Map((landsList || []).map(l => [l.id, l]));
+
+  return dbApps.map(dbApp => {
+    const { uiType, uiStatus, documentName, details } = parseDescription(dbApp.description, dbApp.application_type, dbApp.status);
+    const user = userMap.get(dbApp.citizen_id);
+    const land = landMap.get(dbApp.land_id);
+
+    return {
+      id: dbApp.id,
+      application_number: dbApp.application_number,
+      citizen_id: dbApp.citizen_id,
+      applicant_name: user?.name || 'Citizen',
+      email: user?.email || '',
+      phone: user?.phone || '',
+      land_id: dbApp.land_id,
+      survey_number: land?.survey_number || '',
+      patta_number: land?.patta_number || '',
+      village: land?.village || '',
+      taluk: land?.taluk || '',
+      district: land?.district || '',
+      property_extent: land?.land_extent_acres ? `${land.land_extent_acres} Acres` : '',
+      type: uiType,
+      details: details,
+      document_name: documentName,
+      status: uiStatus,
+      officer_remarks: dbApp.officer_remarks || '',
+      created_at: dbApp.submitted_at || dbApp.created_at || new Date().toISOString(),
+      updated_at: dbApp.updated_at || dbApp.updated_at || new Date().toISOString()
+    };
+  });
 }
 
 export const applicationService = {
@@ -97,41 +200,28 @@ export const applicationService = {
    */
   async createApplication(userId: string, landId: string, type: string, details: string, documentName: string) {
     const dbQuery = async () => {
-      // Get applicant details
-      const { data: user } = await supabase.from('users').select('*').eq('id', userId).single();
-      const applicantName = user?.name || 'Citizen';
-      const email = user?.email || '';
-      const phone = user?.phone || '';
-
-      // Get land details
-      const { data: land } = await supabase.from('land_records').select('*').eq('id', landId).maybeSingle();
+      const appNumber = 'APP-' + Math.floor(100000 + Math.random() * 900000);
+      const dbType = type === 'sale_transfer' ? 'OTHER_APPROVAL' : type.toUpperCase();
+      const dbStatus = 'SUBMITTED';
+      const dbDescription = `[UIStatus: submitted][UIType: ${type}][DocName: ${documentName || ''}]${details || ''}`;
 
       const { data, error } = await supabase
         .from('applications')
         .insert([
           {
+            application_number: appNumber,
             citizen_id: userId,
-            applicant_name: applicantName,
-            email,
-            phone,
             land_id: landId,
-            survey_number: land?.survey_number || '',
-            patta_number: land?.patta_number || '',
-            village: land?.village || '',
-            taluk: land?.taluk || '',
-            district: land?.district || '',
-            property_extent: land?.land_extent_acres ? `${land.land_extent_acres} Acres` : '',
-            type,
-            details,
-            document_name: documentName,
-            status: 'Submitted'
+            application_type: dbType,
+            description: dbDescription,
+            status: dbStatus
           }
         ])
         .select()
         .single();
 
       if (error) throw error;
-      return { ...data, status: mapStatusDbToUi(data.status) };
+      return await mapDbToModel(data);
     };
 
     const fallbackQuery = async () => {
@@ -141,6 +231,7 @@ export const applicationService = {
 
       const newApp = {
         id: `app-${Date.now()}`,
+        application_number: 'APP-MEM-' + Math.floor(100000 + Math.random() * 900000),
         citizen_id: userId,
         applicant_name: user?.name || 'Citizen Applicant',
         email: user?.email || '',
@@ -180,7 +271,7 @@ export const applicationService = {
         .order('updated_at', { ascending: false });
 
       if (error) throw error;
-      return (data || []).map(app => ({ ...app, status: mapStatusDbToUi(app.status) }));
+      return await mapDbToModelBatch(data || []);
     };
 
     const fallbackQuery = async () => {
@@ -198,16 +289,23 @@ export const applicationService = {
       let query = supabase.from('applications').select('*');
 
       if (filters.status) {
-        query = query.eq('status', mapStatusUiToDb(filters.status));
-      }
-      if (filters.type) {
-        query = query.eq('type', filters.type);
+        let dbStatus = filters.status.toUpperCase();
+        if (dbStatus === 'INFO_REQUIRED') dbStatus = 'UNDER_REVIEW';
+        query = query.eq('status', dbStatus);
       }
 
       const { data, error } = await query.order('updated_at', { ascending: false });
       if (error) throw error;
 
-      return (data || []).map(app => ({ ...app, status: mapStatusDbToUi(app.status) }));
+      let results = await mapDbToModelBatch(data || []);
+
+      if (filters.status) {
+        results = results.filter(app => app.status === filters.status);
+      }
+      if (filters.type) {
+        results = results.filter(app => app.type === filters.type);
+      }
+      return results;
     };
 
     const fallbackQuery = async () => {
@@ -237,7 +335,7 @@ export const applicationService = {
 
       if (error) throw error;
       if (!data) return null;
-      return { ...data, status: mapStatusDbToUi(data.status) };
+      return await mapDbToModel(data);
     };
 
     const fallbackQuery = async () => {
@@ -261,10 +359,25 @@ export const applicationService = {
     const newStatus = statusMap[action];
 
     const dbQuery = async () => {
+      const { data: existing, error: getErr } = await supabase
+        .from('applications')
+        .select('*')
+        .eq('id', id)
+        .single();
+      
+      if (getErr) throw getErr;
+
+      const { uiType, documentName, details } = parseDescription(existing.description, existing.application_type, existing.status);
+
+      const uiStatus = action === 'approve' ? 'approved' : action === 'request_info' ? 'info_required' : 'rejected';
+      const dbStatus = action === 'approve' ? 'APPROVED' : action === 'request_info' ? 'UNDER_REVIEW' : 'REJECTED';
+      const updatedDescription = `[UIStatus: ${uiStatus}][UIType: ${uiType}][DocName: ${documentName || ''}]${details || ''}`;
+
       const { data, error } = await supabase
         .from('applications')
         .update({
-          status: newStatus,
+          status: dbStatus,
+          description: updatedDescription,
           officer_remarks: remarks,
           updated_at: new Date().toISOString()
         })
@@ -282,7 +395,7 @@ export const applicationService = {
           'land_use_change': 'Land Use Change',
           'other_approval': 'Petitions / Approval'
         };
-        const label = typeLabels[data.type] || 'Application';
+        const label = typeLabels[uiType] || 'Application';
         await notificationService.createNotification(
           data.citizen_id,
           'land_record',
@@ -295,7 +408,7 @@ export const applicationService = {
         console.error('Warning: Failed to create application notification:', e.message);
       }
 
-      return { ...data, status: mapStatusDbToUi(data.status) };
+      return await mapDbToModel(data);
     };
 
     const fallbackQuery = async () => {
