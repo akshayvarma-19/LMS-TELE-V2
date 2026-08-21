@@ -13,10 +13,10 @@ export const publicLandService = {
    * Selects ONLY the designated public columns.
    */
   async searchPublicLands(filters: PublicSearchFilters, page: number, limit: number) {
-    // Build initial query selecting ONLY public fields
+    // Build initial query selecting public and coordinate/classification fields
     let query = supabase
       .from('land_records')
-      .select('survey_number, property_extent:land_extent_acres, village, taluk, district', { count: 'exact' });
+      .select('id, survey_number, land_extent_acres, village, taluk, district, land_classification, latitude, longitude', { count: 'exact' });
 
     // Apply filters with AND conditions
     if (filters.survey_number && filters.survey_number.trim()) {
@@ -50,11 +50,53 @@ export const publicLandService = {
       throw new Error(`Public land search failed: ${error.message}`);
     }
 
+    // Retrieve anomalies for the matching records
+    const landIds = data ? data.map(r => r.id) : [];
+    let anomalies: any[] = [];
+    if (landIds.length > 0) {
+      const { data: anomaliesData, error: anomaliesError } = await supabase
+        .from('land_anomalies')
+        .select('id, land_id, anomaly_type, severity, risk_score, description, status')
+        .in('land_id', landIds);
+
+      if (!anomaliesError && anomaliesData) {
+        anomalies = anomaliesData;
+      }
+    }
+
+    // Map anomalies to their corresponding land record
+    const anomalyMap = new Map<string, any[]>();
+    anomalies.forEach(a => {
+      const list = anomalyMap.get(a.land_id) || [];
+      list.push({
+        id: a.id,
+        anomaly_type: a.anomaly_type,
+        severity: a.severity,
+        risk_score: a.risk_score,
+        description: a.description,
+        status: a.status
+      });
+      anomalyMap.set(a.land_id, list);
+    });
+
+    const records = (data || []).map(r => ({
+      id: r.id,
+      survey_number: r.survey_number,
+      property_extent: r.land_extent_acres ? `${r.land_extent_acres} Acres` : 'N/A',
+      village: r.village,
+      taluk: r.taluk,
+      district: r.district,
+      land_type: r.land_classification,
+      latitude: r.latitude,
+      longitude: r.longitude,
+      anomalies: anomalyMap.get(r.id) || []
+    }));
+
     const total = count || 0;
     const totalPages = Math.ceil(total / limit);
 
     return {
-      records: data || [],
+      records,
       pagination: {
         page,
         limit,

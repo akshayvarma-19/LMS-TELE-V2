@@ -41,11 +41,16 @@ export interface LandRecord {
  * ONLY exposes survey_number, property_extent, village, taluk, district
  */
 export interface PublicLandRecord {
+  id?: string;
   survey_number: string;
   property_extent: string;
   village: string;
   taluk: string;
   district: string;
+  land_type?: string;
+  latitude?: number;
+  longitude?: number;
+  anomalies?: LandAnomaly[];
   has_anomaly_warning?: boolean;
 }
 

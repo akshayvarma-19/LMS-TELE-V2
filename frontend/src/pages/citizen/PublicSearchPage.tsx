@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Search, ShieldCheck, AlertCircle, Loader2 } from 'lucide-react';
+import { Search, ShieldCheck, AlertCircle, Loader2, Globe } from 'lucide-react';
 import { EmptyState } from '../../components/common/EmptyState';
+import { Land3DMap } from '../../components/common/Land3DMap';
 import { landService } from '../../services/landService';
 import type { PublicLandRecord } from '../../types';
 
@@ -20,12 +21,27 @@ export const PublicSearchPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [searchResults, setSearchResults] = useState<PublicLandRecord[]>([]);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [selectedLand, setSelectedLand] = useState<PublicLandRecord | null>(null);
 
   // Suggestions state
   const [activeField, setActiveField] = useState<'surveyNumber' | 'village' | 'taluk' | 'district' | null>(null);
   const [suggestions, setSuggestions] = useState<SuggestionItem[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [searchTimer, setSearchTimer] = useState<any>(null);
+
+  const handleViewLand = (record: PublicLandRecord) => {
+    setSelectedLand(record);
+    setTimeout(() => {
+      document.getElementById('land-map-details-section')?.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
+  };
+
+  const handleView3D = (record: PublicLandRecord) => {
+    setSelectedLand(record);
+    setTimeout(() => {
+      document.getElementById('land-map-details-section')?.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
+  };
 
   // Clean up timer on unmount
   useEffect(() => {
@@ -388,34 +404,183 @@ export const PublicSearchPage: React.FC = () => {
             icon={<AlertCircle className="w-6 h-6 text-slate-400" />}
           />
         ) : (
-          <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse text-xs">
-                <thead>
-                  <tr className="bg-slate-50 text-slate-500 font-bold border-b border-slate-200">
-                    <th className="p-4">Survey Number</th>
-                    <th className="p-4">Property Extent</th>
-                    <th className="p-4">Village</th>
-                    <th className="p-4">Taluk</th>
-                    <th className="p-4">District</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100 text-slate-700">
-                  {searchResults.map((r, idx) => (
-                    <tr key={idx} className="hover:bg-slate-50 transition-colors">
-                      <td className="p-4 font-bold text-slate-900 font-mono">{r.survey_number}</td>
-                      <td className="p-4 font-medium">{r.property_extent} Acres</td>
-                      <td className="p-4">{r.village}</td>
-                      <td className="p-4">{r.taluk}</td>
-                      <td className="p-4">{r.district}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {searchResults.map((r, idx) => {
+              const hasAnomalies = Array.isArray(r.anomalies) && r.anomalies.length > 0;
+              return (
+                <div key={idx} className="bg-white rounded-2xl border border-slate-200 p-5 flex flex-col justify-between shadow-xs">
+                  <div className="space-y-3.5">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400">Survey Number</span>
+                        <h4 className="text-base font-extrabold text-[#034E4E] font-mono">{r.survey_number}</h4>
+                      </div>
+                      <span className="bg-[#F4F8F7] border border-[#D9E2E1] text-[#034E4E] px-2 py-0.5 rounded text-[11px] font-bold">
+                        {r.property_extent}
+                      </span>
+                    </div>
+                    
+                    <div className="grid grid-cols-3 gap-2 py-2.5 border-y border-slate-100 text-[11px] text-slate-600">
+                      <div>
+                        <span className="block font-medium text-slate-400 text-[9px] uppercase">Village</span>
+                        <span className="font-semibold text-slate-800 truncate block">{r.village}</span>
+                      </div>
+                      <div>
+                        <span className="block font-medium text-slate-400 text-[9px] uppercase">Taluk</span>
+                        <span className="font-semibold text-slate-800 truncate block">{r.taluk}</span>
+                      </div>
+                      <div>
+                        <span className="block font-medium text-slate-400 text-[9px] uppercase">District</span>
+                        <span className="font-semibold text-slate-800 truncate block">{r.district}</span>
+                      </div>
+                    </div>
+
+                    {/* Anomaly notice section */}
+                    {hasAnomalies ? (
+                      <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 space-y-1.5">
+                        <div className="flex items-center space-x-1.5 text-amber-900 font-bold text-xs">
+                          <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
+                          <span>⚠️ Potential Anomaly</span>
+                        </div>
+                        {r.anomalies!.length === 1 ? (
+                          <div className="text-[10px] text-amber-700 leading-normal space-y-0.5">
+                            <p><b>Anomaly Type:</b> {r.anomalies![0].anomaly_type}</p>
+                            <p><b>Severity:</b> <span className="capitalize">{r.anomalies![0].severity}</span></p>
+                            <p><b>Risk Score:</b> {r.anomalies![0].risk_score}</p>
+                          </div>
+                        ) : (
+                          <div className="text-[10px] text-amber-700 leading-normal">
+                            <p className="font-semibold">{r.anomalies!.length} anomalies detected</p>
+                            <p className="mt-0.5">Click View Land to inspect details.</p>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="p-2.5 rounded-lg bg-emerald-50 border border-emerald-100 text-[10px] text-emerald-800 font-semibold flex items-center space-x-1.5">
+                        <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                        <span>No anomalies reported for this record.</span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-3 mt-5 pt-3 border-t border-slate-100">
+                    <button
+                      onClick={() => handleViewLand(r)}
+                      className="flex-1 py-2 text-center border border-[#034E4E] hover:bg-[#F4F8F7] text-[#034E4E] font-semibold text-xs rounded-lg transition-colors cursor-pointer"
+                    >
+                      View Land
+                    </button>
+                    <button
+                      onClick={() => handleView3D(r)}
+                      className="flex-1 py-2 text-center bg-[#034E4E] hover:bg-[#023B3B] text-white font-semibold text-xs rounded-lg transition-colors cursor-pointer"
+                    >
+                      View in 3D
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         )}
       </div>
+
+      {/* Selected Land Detail Section */}
+      {selectedLand && (
+        <div id="land-map-details-section" className="scroll-mt-6 space-y-4 pt-4 border-t border-slate-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <span className="text-xs font-bold text-blue-700 uppercase tracking-wider">Property Workspace</span>
+              <h3 className="text-lg font-extrabold text-[#034E4E] mt-0.5 tracking-tight">
+                3D Globe & Property Detail View
+              </h3>
+            </div>
+            <button
+              onClick={() => setSelectedLand(null)}
+              className="text-xs text-slate-500 hover:text-slate-700 underline cursor-pointer"
+            >
+              Close Details
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* 3D Map Container */}
+            <div className="lg:col-span-2">
+              <Land3DMap
+                key={selectedLand.id || selectedLand.survey_number}
+                className="h-[500px]"
+                latitude={selectedLand.latitude}
+                longitude={selectedLand.longitude}
+                surveyNumber={selectedLand.survey_number}
+                village={selectedLand.village}
+                taluk={selectedLand.taluk}
+                district={selectedLand.district}
+                propertyExtent={selectedLand.property_extent}
+                landType={selectedLand.land_type}
+              />
+            </div>
+
+            {/* Sidebar Details Panel */}
+            <div className="lg:col-span-1 bg-white rounded-2xl border border-slate-200 p-6 flex flex-col justify-between h-[500px] overflow-y-auto">
+              <div className="space-y-4">
+                <div>
+                  <h4 className="text-xs font-extrabold text-slate-400 uppercase tracking-wider pb-2 border-b border-slate-100">
+                    Basic Title Information
+                  </h4>
+                  <div className="mt-3 text-xs space-y-2">
+                    <p className="text-slate-600"><b>Survey No:</b> <span className="font-bold font-mono text-[#034E4E]">{selectedLand.survey_number}</span></p>
+                    <p className="text-slate-600"><b>Property Extent:</b> <span className="font-semibold text-slate-800">{selectedLand.property_extent}</span></p>
+                    <p className="text-slate-600"><b>Land Classification:</b> <span className="font-semibold text-slate-800">{selectedLand.land_type || 'N/A'}</span></p>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="text-xs font-extrabold text-slate-400 uppercase tracking-wider pb-2 border-b border-slate-100">
+                    Location Indicators
+                  </h4>
+                  <div className="mt-3 text-xs space-y-2 text-slate-600">
+                    <p><b>Village:</b> {selectedLand.village}</p>
+                    <p><b>Taluk:</b> {selectedLand.taluk}</p>
+                    <p><b>District:</b> {selectedLand.district}</p>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="text-xs font-extrabold text-slate-400 uppercase tracking-wider pb-2 border-b border-slate-100">
+                    Anomalies & Discrepancies
+                  </h4>
+                  <div className="mt-3 space-y-3">
+                    {Array.isArray(selectedLand.anomalies) && selectedLand.anomalies.length > 0 ? (
+                      selectedLand.anomalies.map((a, idx) => (
+                        <div key={idx} className="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-xs space-y-1">
+                          <div className="flex items-center space-x-1.5 text-amber-900 font-bold">
+                            <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
+                            <span>⚠ Potential Anomaly</span>
+                          </div>
+                          <div className="text-[11px] text-amber-700 leading-normal space-y-1">
+                            <p><b>Type:</b> {a.anomaly_type}</p>
+                            <p><b>Severity:</b> <span className="capitalize font-semibold">{a.severity}</span></p>
+                            <p><b>Risk Score:</b> <span className="font-mono font-bold">{a.risk_score}</span></p>
+                            {a.description && <p className="text-[10px] text-amber-600 italic bg-white/50 p-1.5 rounded border border-amber-100 mt-1">"{a.description}"</p>}
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-100 text-xs text-emerald-800 font-semibold flex items-center space-x-1.5">
+                        <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+                        <span>No anomalies reported for this record.</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-4 pt-3 border-t border-slate-100 text-[10px] text-slate-400 font-mono text-center">
+                WGS 84 • 3D Terrain Elevation Engine
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
