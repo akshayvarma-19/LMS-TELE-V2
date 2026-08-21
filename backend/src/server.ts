@@ -15,6 +15,8 @@ import ocrExtractionRouter from './routes/ocrExtractionRoutes.js';
 import assistantRouter from './routes/assistantRoutes.js';
 import mapRouter from './routes/mapRoutes.js';
 import notificationRouter from './routes/notificationRoutes.js';
+import citizenApplicationRouter from './routes/citizenApplicationRoutes.js';
+import officerApplicationRouter from './routes/officerApplicationRoutes.js';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -39,6 +41,8 @@ app.use('/api/citizen/ocr', ocrExtractionRouter);
 app.use('/api/assistant', assistantRouter);
 app.use('/api/map', mapRouter);
 app.use('/api/notifications', notificationRouter);
+app.use('/api/citizen/applications', citizenApplicationRouter);
+app.use('/api/officer/applications', officerApplicationRouter);
 
 
 

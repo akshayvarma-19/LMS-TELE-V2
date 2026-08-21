@@ -44,8 +44,11 @@ export const authService = {
     localStorage.removeItem('supabase_session');
   },
 
-  async updateProfile(_data: Partial<User>): Promise<ApiResponse<User>> {
-    return request<ApiResponse<User>>('/auth/profile');
+  async updateProfile(data: Partial<User>): Promise<ApiResponse<User>> {
+    return request<ApiResponse<User>>('/auth/profile', {
+      method: 'PUT',
+      body: JSON.stringify(data)
+    });
   }
 };
 

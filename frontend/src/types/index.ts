@@ -190,3 +190,29 @@ export interface VerificationResult {
   canRaiseGrievance: boolean;
   fields: VerificationFieldResult[];
 }
+
+export type ApplicationStatus = 'submitted' | 'under_review' | 'info_required' | 'approved' | 'rejected';
+export type ApplicationCategory = 'sale_transfer' | 'construction_approval' | 'land_use_change' | 'other_approval';
+
+export interface ApplicationRecord {
+  id: string;
+  citizen_id: string;
+  applicant_name: string;
+  email: string;
+  phone: string;
+  land_id: string;
+  survey_number: string;
+  patta_number: string;
+  village: string;
+  taluk: string;
+  district: string;
+  property_extent: string;
+  type: ApplicationCategory;
+  details: string;
+  document_name: string;
+  status: ApplicationStatus;
+  officer_remarks: string;
+  created_at: string;
+  updated_at: string;
+}
+

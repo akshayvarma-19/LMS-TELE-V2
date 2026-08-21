@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { supabase, supabaseAdmin } from '../lib/supabase.js';
+import { authenticateToken, AuthenticatedRequest } from '../middleware/auth.js';
 
 const router = Router();
 
@@ -177,6 +178,123 @@ router.post('/register', async (req: Request, res: Response): Promise<void> => {
     res.status(500).json({
       status: 'error',
       message: 'An unexpected server error occurred during registration',
+      error: err?.message || String(err)
+    });
+  }
+});
+
+/**
+ * GET /api/auth/me
+ * Retrieve the current authenticated user's profile details.
+ */
+router.get('/me', authenticateToken as any, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      res.status(401).json({
+        status: 'error',
+        message: 'Unauthorized access.'
+      });
+      return;
+    }
+
+    const { data: dbUser, error } = await supabaseAdmin
+      .from('users')
+      .select('*')
+      .eq('id', userId)
+      .maybeSingle();
+
+    if (error || !dbUser) {
+      res.status(404).json({
+        status: 'error',
+        message: 'User profile not found in database.'
+      });
+      return;
+    }
+
+    res.json({
+      status: 'success',
+      data: {
+        id: dbUser.id,
+        name: dbUser.name,
+        username: dbUser.username,
+        email: dbUser.email,
+        phone: dbUser.phone,
+        role: dbUser.role,
+        created_at: dbUser.created_at
+      }
+    });
+  } catch (err: any) {
+    res.status(500).json({
+      status: 'error',
+      message: 'An unexpected server error occurred while retrieving user details',
+      error: err?.message || String(err)
+    });
+  }
+});
+
+/**
+ * PUT /api/auth/profile
+ * Update user profile details.
+ */
+router.put('/profile', authenticateToken as any, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      res.status(401).json({
+        status: 'error',
+        message: 'Unauthorized access.'
+      });
+      return;
+    }
+
+    const { name, full_name, phone } = req.body;
+    const resolvedName = name || full_name;
+
+    const { data: updatedUser, error } = await supabaseAdmin
+      .from('users')
+      .update({
+        name: resolvedName,
+        phone,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', userId)
+      .select()
+      .single();
+
+    if (error) {
+      res.status(400).json({
+        status: 'error',
+        message: `Failed to update profile: ${error.message}`
+      });
+      return;
+    }
+
+    // Also update auth user metadata
+    await supabaseAdmin.auth.admin.updateUserById(userId, {
+      user_metadata: {
+        name: resolvedName,
+        phone
+      }
+    });
+
+    res.json({
+      status: 'success',
+      message: 'Profile updated successfully!',
+      data: {
+        id: updatedUser.id,
+        name: updatedUser.name,
+        username: updatedUser.username,
+        email: updatedUser.email,
+        phone: updatedUser.phone,
+        role: updatedUser.role,
+        created_at: updatedUser.created_at
+      }
+    });
+  } catch (err: any) {
+    res.status(500).json({
+      status: 'error',
+      message: 'An unexpected server error occurred while updating profile',
       error: err?.message || String(err)
     });
   }
