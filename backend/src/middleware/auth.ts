@@ -37,7 +37,7 @@ export async function authenticateToken(req: Request, res: Response, next: NextF
       const { data: dbUser } = await supabaseAdmin
         .from('users')
         .select('*')
-        .eq('email', user.email)
+        .ilike('email', user.email)
         .maybeSingle();
 
       if (dbUser) {

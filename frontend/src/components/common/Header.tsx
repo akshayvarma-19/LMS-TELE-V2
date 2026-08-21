@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Building2, Bell, User, LogOut, ShieldCheck, RefreshCw } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { notificationService } from '../../services/notificationService';
+import { authService } from '../../services/authService';
 
 interface HeaderProps {
   userRole?: 'citizen' | 'officer';
@@ -42,11 +43,22 @@ export const Header: React.FC<HeaderProps> = ({ userRole = 'citizen', onLogout }
     }
   }, [userRole]);
 
-  const handlePortalSwitch = () => {
-    if (userRole === 'citizen') {
-      navigate('/officer/dashboard');
-    } else {
-      navigate('/citizen/dashboard');
+  const handlePortalSwitch = async () => {
+    try {
+      if (userRole === 'citizen') {
+        await authService.login({ username: 'deshana', password: 'password', role: 'officer' });
+        navigate('/officer/dashboard');
+      } else {
+        await authService.login({ username: 'rama', password: 'password', role: 'citizen' });
+        navigate('/citizen/dashboard');
+      }
+      window.location.reload();
+    } catch (err) {
+      if (userRole === 'citizen') {
+        navigate('/officer/dashboard');
+      } else {
+        navigate('/citizen/dashboard');
+      }
     }
   };
 

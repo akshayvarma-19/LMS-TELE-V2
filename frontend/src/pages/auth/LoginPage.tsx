@@ -90,11 +90,21 @@ export const LoginPage: React.FC = () => {
     }
   };
 
-  const handleBypassToDemo = (selectedRole: UserRole) => {
-    if (selectedRole === 'officer') {
-      navigate('/officer/dashboard');
-    } else {
-      navigate('/citizen/dashboard');
+  const handleBypassToDemo = async (selectedRole: UserRole) => {
+    try {
+      if (selectedRole === 'officer') {
+        await authService.login({ username: 'deshana', password: 'password', role: 'officer' });
+        navigate('/officer/dashboard');
+      } else {
+        await authService.login({ username: 'rama', password: 'password', role: 'citizen' });
+        navigate('/citizen/dashboard');
+      }
+    } catch (err) {
+      if (selectedRole === 'officer') {
+        navigate('/officer/dashboard');
+      } else {
+        navigate('/citizen/dashboard');
+      }
     }
   };
 
