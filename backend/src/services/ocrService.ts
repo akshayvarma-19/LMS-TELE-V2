@@ -1,7 +1,8 @@
 import fs from 'fs';
 import path from 'path';
 import { createWorker } from 'tesseract.js';
-import pdfParse from 'pdf-parse';
+import _pdfParse from 'pdf-parse';
+const pdfParse = (_pdfParse as any).default || _pdfParse;
 import { supabase } from '../lib/supabase.js';
 import { ocrFieldExtractor } from './ocrFieldExtractor.js';
 
@@ -124,7 +125,7 @@ Parent Document: DOC-2015-1102`;
       const extractedFields = ocrFieldExtractor.extractFields(rawText);
 
       // 7. Update document record with success status and extracted fields
-      const { data: updatedDoc, error: updateError } = await supabase
+      const { data: updatedDocs, error: updateError } = await supabase
         .from('land_documents')
         .update({
           ocr_status: 'completed',
@@ -133,12 +134,17 @@ Parent Document: DOC-2015-1102`;
           updated_at: new Date().toISOString()
         })
         .eq('id', id)
-        .select()
-        .single();
+        .select();
 
       if (updateError) {
         throw new Error(`Failed to save extracted data: ${updateError.message}`);
       }
+
+      if (!updatedDocs || updatedDocs.length === 0) {
+        throw new Error(`Failed to save extracted data: No rows matching ID "${id}" were updated.`);
+      }
+
+      const updatedDoc = updatedDocs[0];
 
       // Trigger notification for successful OCR completion
       try {
