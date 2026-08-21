@@ -78,7 +78,16 @@ export const ocrService = {
 
   async getAllDocuments(): Promise<ApiResponse<LandDocument[]>> {
     try {
-      const res = await request<any>('/citizen/ocr/documents');
+      const sessionStr = localStorage.getItem('supabase_session');
+      let role = 'citizen';
+      if (sessionStr) {
+        try {
+          const session = JSON.parse(sessionStr);
+          role = session.user?.user_metadata?.role || session.role || 'citizen';
+        } catch (e) {}
+      }
+      const endpoint = role === 'officer' ? '/officer/ocr/documents' : '/citizen/ocr/documents';
+      const res = await request<any>(endpoint);
       const docs = res.data || res;
       return { status: 'success', data: docs as LandDocument[] };
     } catch (err: any) {

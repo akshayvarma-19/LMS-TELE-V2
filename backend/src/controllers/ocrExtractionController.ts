@@ -306,9 +306,10 @@ export const ocrExtractionController = {
    */
   async getAllDocuments(req: AuthenticatedRequest, res: Response): Promise<void> {
     try {
+      const userRole = req.user?.user_metadata?.role || 'citizen';
       const citizenId = req.user?.id;
       let query = supabase.from('land_documents').select('*').order('uploaded_at', { ascending: false });
-      if (citizenId) {
+      if (userRole === 'citizen' && citizenId) {
         query = query.eq('uploaded_by', citizenId);
       }
 

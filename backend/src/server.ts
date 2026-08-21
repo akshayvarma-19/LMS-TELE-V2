@@ -17,6 +17,7 @@ import mapRouter from './routes/mapRoutes.js';
 import notificationRouter from './routes/notificationRoutes.js';
 import citizenApplicationRouter from './routes/citizenApplicationRoutes.js';
 import officerApplicationRouter from './routes/officerApplicationRoutes.js';
+import officerOcrRouter from './routes/officerOcrRoutes.js';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -43,6 +44,7 @@ app.use('/api/map', mapRouter);
 app.use('/api/notifications', notificationRouter);
 app.use('/api/citizen/applications', citizenApplicationRouter);
 app.use('/api/officer/applications', officerApplicationRouter);
+app.use('/api/officer/ocr', officerOcrRouter);
 
 
 
