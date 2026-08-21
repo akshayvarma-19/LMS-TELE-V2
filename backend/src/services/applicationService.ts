@@ -177,7 +177,7 @@ export const applicationService = {
         .from('applications')
         .select('*')
         .eq('citizen_id', userId)
-        .order('created_at', { ascending: false });
+        .order('updated_at', { ascending: false });
 
       if (error) throw error;
       return (data || []).map(app => ({ ...app, status: mapStatusDbToUi(app.status) }));
@@ -204,7 +204,7 @@ export const applicationService = {
         query = query.eq('type', filters.type);
       }
 
-      const { data, error } = await query.order('created_at', { ascending: false });
+      const { data, error } = await query.order('updated_at', { ascending: false });
       if (error) throw error;
 
       return (data || []).map(app => ({ ...app, status: mapStatusDbToUi(app.status) }));
