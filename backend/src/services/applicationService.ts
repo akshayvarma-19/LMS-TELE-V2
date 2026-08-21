@@ -187,8 +187,12 @@ export const applicationService = {
     try {
       return await dbQuery();
     } catch (err: any) {
-      if (err.message && (err.message.includes('schema cache') || err.message.includes('relation "applications" does not exist') || err.code === 'PGRST205')) {
-        console.warn('Supabase applications table not found. Using in-memory fallback.');
+      const errMsg = err.message || '';
+      const isDbMissing = errMsg.includes('schema cache') || errMsg.includes('relation "applications" does not exist') || err.code === 'PGRST205';
+      const isOffline = errMsg.includes('fetch failed') || errMsg.includes('getaddrinfo') || errMsg.includes('ENOTFOUND') || errMsg.includes('ECONNREFUSED');
+
+      if (isDbMissing || isOffline) {
+        console.warn('Supabase applications connection unavailable. Using in-memory fallback. Error:', errMsg);
         return await fallbackQuery();
       }
       throw err;
