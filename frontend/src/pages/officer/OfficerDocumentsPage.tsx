@@ -36,6 +36,33 @@ export const OfficerDocumentsPage: React.FC = () => {
     return doc.ocr_status === statusFilter;
   });
 
+  const handleViewFile = (fileUrl: string, fileName: string) => {
+    if (fileUrl.startsWith('data:')) {
+      try {
+        const arr = fileUrl.split(',');
+        const mime = arr[0].match(/:(.*?);/)?.[1] || 'application/octet-stream';
+        const bstr = atob(arr[1]);
+        let n = bstr.length;
+        const u8arr = new Uint8Array(n);
+        while (n--) {
+          u8arr[n] = bstr.charCodeAt(n);
+        }
+        const blob = new Blob([u8arr], { type: mime });
+        const url = URL.createObjectURL(blob);
+        window.open(url, '_blank');
+      } catch (e) {
+        console.error('Failed to open base64 file:', e);
+        // Fallback: trigger download
+        const link = document.createElement('a');
+        link.href = fileUrl;
+        link.download = fileName;
+        link.click();
+      }
+    } else {
+      window.open(fileUrl, '_blank');
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -115,15 +142,13 @@ export const OfficerDocumentsPage: React.FC = () => {
                   </span>
 
                   {doc.file_url && (
-                    <a
-                      href={doc.file_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                    <button
+                      onClick={() => handleViewFile(doc.file_url, doc.file_name)}
                       className="px-3 py-1 bg-[#F4F8F7] hover:bg-[#E4ECEB] text-[#034E4E] rounded-lg text-xs font-semibold flex items-center space-x-1 border border-[#D9E2E1] transition-colors"
                     >
                       <span>View File</span>
                       <ExternalLink className="w-3 h-3" />
-                    </a>
+                    </button>
                   )}
                 </div>
               </div>

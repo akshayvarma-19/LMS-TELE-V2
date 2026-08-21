@@ -1,8 +1,19 @@
 import { Response } from 'express';
 import { AuthenticatedRequest } from '../middleware/auth.js';
-import { supabase } from '../lib/supabase.js';
+import { supabaseAdmin } from '../lib/supabase.js';
 import { ocrService } from '../services/ocrService.js';
 import { ocrVerificationService } from '../services/ocrVerificationService.js';
+
+function mapDbDocumentToModel(dbDoc: any) {
+  if (!dbDoc) return null;
+  return {
+    ...dbDoc,
+    extracted_owner_name: dbDoc.extracted_owner || null,
+    extracted_patta_number: dbDoc.extracted_patta || null,
+    extracted_property_extent: dbDoc.extracted_area || null,
+    extracted_land_type: dbDoc.extracted_classification || null
+  };
+}
 
 export const ocrExtractionController = {
   /**
@@ -31,7 +42,7 @@ export const ocrExtractionController = {
       }
 
       // Check document existence & ownership
-      const { data: document, error: fetchError } = await supabase
+      const { data: document, error: fetchError } = await supabaseAdmin
         .from('land_documents')
         .select('uploaded_by')
         .eq('id', id)
@@ -58,7 +69,7 @@ export const ocrExtractionController = {
 
       res.status(200).json({
         success: true,
-        data: updatedRecord
+        data: mapDbDocumentToModel(updatedRecord)
       });
     } catch (err: any) {
       console.error('Extract OCR controller error:', err);
@@ -98,7 +109,7 @@ export const ocrExtractionController = {
       }
 
       // Get document details
-      const { data: document, error: fetchError } = await supabase
+      const { data: document, error: fetchError } = await supabaseAdmin
         .from('land_documents')
         .select('*')
         .eq('id', id)
@@ -122,7 +133,7 @@ export const ocrExtractionController = {
 
       res.status(200).json({
         success: true,
-        data: document
+        data: mapDbDocumentToModel(document)
       });
     } catch (err: any) {
       console.error('Get extracted data controller error:', err);
@@ -203,7 +214,7 @@ export const ocrExtractionController = {
       }
 
       // Check document existence & ownership
-      const { data: document, error: fetchError } = await supabase
+      const { data: document, error: fetchError } = await supabaseAdmin
         .from('land_documents')
         .select('uploaded_by')
         .eq('id', id)
@@ -230,7 +241,7 @@ export const ocrExtractionController = {
 
       res.status(200).json({
         success: true,
-        data: updatedRecord
+        data: mapDbDocumentToModel(updatedRecord)
       });
     } catch (err: any) {
       console.error('Reprocess OCR controller error:', err);
@@ -261,7 +272,7 @@ export const ocrExtractionController = {
         return;
       }
 
-      const { data: dbData, error: dbError } = await supabase
+      const { data: dbData, error: dbError } = await supabaseAdmin
         .from('land_documents')
         .insert([
           {
@@ -289,7 +300,7 @@ export const ocrExtractionController = {
 
       res.status(201).json({
         success: true,
-        data: dbData
+        data: mapDbDocumentToModel(dbData)
       });
     } catch (err: any) {
       console.error('Create document error:', err);
@@ -308,7 +319,7 @@ export const ocrExtractionController = {
     try {
       const userRole = req.user?.user_metadata?.role || 'citizen';
       const citizenId = req.user?.id;
-      let query = supabase.from('land_documents').select('*').order('uploaded_at', { ascending: false });
+      let query = supabaseAdmin.from('land_documents').select('*').order('uploaded_at', { ascending: false });
       if (userRole === 'citizen' && citizenId) {
         query = query.eq('uploaded_by', citizenId);
       }
@@ -318,7 +329,7 @@ export const ocrExtractionController = {
 
       res.status(200).json({
         success: true,
-        data
+        data: (data || []).map(mapDbDocumentToModel)
       });
     } catch (err: any) {
       console.error('Get all documents error:', err);
